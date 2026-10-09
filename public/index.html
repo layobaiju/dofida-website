@@ -58,11 +58,24 @@
     <a href="#locations"><span class="roll" data-text="{{t.nav.findus}}"><span>{{t.nav.findus}}</span></span></a>
     <a href="#faq"><span class="roll" data-text="{{t.nav.faq}}"><span>{{t.nav.faq}}</span></span></a>
     <a class="btn btn--sm btn--ink nav__cta" href="#enquire">{{t.nav.enquire}}</a>
+    <div class="nav__langs" role="group" aria-label="Language · ഭാഷ · ಭಾಷೆ">
+      <span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>{{t.lang.label}}</span>
+      <a class="lang__opt" href="?lang=en" hreflang="en" lang="en" data-lang="en">English</a>
+      <a class="lang__opt" href="?lang=ml" hreflang="ml" lang="ml" data-lang="ml">മലയാളം</a>
+      <a class="lang__opt" href="?lang=kn" hreflang="kn" lang="kn" data-lang="kn">ಕನ್ನಡ</a>
+    </div>
   </nav>
-  <div class="lang" role="group" aria-label="{{t.lang.label}}">
-    <a class="lang__opt" href="?lang=en" hreflang="en" lang="en" data-lang="en" title="English">EN</a>
-    <a class="lang__opt" href="?lang=ml" hreflang="ml" lang="ml" data-lang="ml" title="മലയാളം">മല</a>
-    <a class="lang__opt" href="?lang=kn" hreflang="kn" lang="kn" data-lang="kn" title="ಕನ್ನಡ">ಕನ್ನ</a>
+  <div class="lang" id="lang">
+    <button class="lang__btn" id="langBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="langMenu" aria-label="Language · ഭാഷ · ಭಾಷೆ">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>
+      <span class="lang__current">{{t.lang.name}}</span><span class="lang__short">{{t.lang.short}}</span>
+      <i class="lang__chev" aria-hidden="true"></i>
+    </button>
+    <ul class="lang__menu" id="langMenu" role="menu" aria-label="Language · ഭാഷ · ಭಾಷೆ" hidden>
+      <li><a class="lang__opt" role="menuitemradio" href="?lang=en" hreflang="en" lang="en" data-lang="en"><b>English</b><small>English</small></a></li>
+      <li><a class="lang__opt" role="menuitemradio" href="?lang=ml" hreflang="ml" lang="ml" data-lang="ml"><b>മലയാളം</b><small>Malayalam</small></a></li>
+      <li><a class="lang__opt" role="menuitemradio" href="?lang=kn" hreflang="kn" lang="kn" data-lang="kn"><b>ಕನ್ನಡ</b><small>Kannada</small></a></li>
+    </ul>
   </div>
   <div class="theme" id="theme">
     <button class="theme__btn" id="themeBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="themeMenu" aria-label="{{t.theme.change}}">
@@ -584,6 +597,10 @@
     <div>
       <p class="footer__h">{{t.foot.talk}}</p>
       <a href="#enquire">{{t.foot.ctaBtn}}</a><a href="#faq">{{t.nav.faq}}</a>
+    </div>
+    <div>
+      <p class="footer__h">{{t.lang.label}} · Language</p>
+      <a class="lang__opt" href="?lang=en" hreflang="en" lang="en" data-lang="en">English</a><a class="lang__opt" href="?lang=ml" hreflang="ml" lang="ml" data-lang="ml">മലയാളം</a><a class="lang__opt" href="?lang=kn" hreflang="kn" lang="kn" data-lang="kn">ಕನ್ನಡ</a>
     </div>
   </div>
   <p class="footer__copy"><span>{{t.foot.rights}}</span><span>{{t.foot.made}}</span></p>

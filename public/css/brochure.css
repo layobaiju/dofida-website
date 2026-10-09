@@ -59,7 +59,9 @@ svg { display: block; }
 @keyframes pan { to { background-position: 56px 56px; } }
 
 /* language switch (hidden when embedded: the home page has its own) */
-.br-lang { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; border: 1px solid var(--line-2); background: rgba(22, 29, 51, .7); margin-left: auto; margin-right: 6px; }
+.br-lang i { display: grid; place-items: center; width: 26px; }
+.br-lang i svg { width: 17px; height: 17px; fill: none; stroke: var(--blue-l); stroke-width: 1.7; stroke-linecap: round; }
+.br-lang { align-items: center; border-color: var(--blue) !important; display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; border: 1px solid var(--line-2); background: rgba(22, 29, 51, .7); margin-left: auto; margin-right: 6px; }
 .br-lang a { display: grid; place-items: center; min-width: 34px; height: 32px; padding: 0 8px; border-radius: 999px; font: 600 12px/1 var(--body); color: var(--muted); transition: background .3s, color .3s; }
 .br-lang a[lang="ml"], .br-lang a[lang="kn"] { font-size: 13px; font-weight: 700; }
 .br-lang a:hover { color: var(--text); }
@@ -455,6 +457,7 @@ svg { display: block; }
   .br-brand small { display: none; }
   .br-brand b { display: none; }
   .br-lang a { min-width: 30px; padding: 0 5px; height: 30px; }
+  .br-lang i { display: none; }
   .br-tool--wide span { display: none; }
   .br-tool--wide { padding: 0; width: 40px; }
   .br-round--lg { width: 46px; height: 46px; }

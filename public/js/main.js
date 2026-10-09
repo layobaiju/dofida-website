@@ -28,6 +28,28 @@
     a.addEventListener('click', () => store.set('dofida-lang-y', String(Math.round(scrollY))));
   });
 
+  // Globe button opens the language menu
+  const langWrap = $('#lang');
+  if (langWrap) {
+    const langBtn = $('#langBtn');
+    const langMenu = $('#langMenu');
+    let langTimer;
+    const setLangOpen = (open) => {
+      clearTimeout(langTimer);
+      langBtn.setAttribute('aria-expanded', String(open));
+      if (open) {
+        langMenu.hidden = false;
+        requestAnimationFrame(() => requestAnimationFrame(() => langWrap.classList.add('is-open')));
+      } else {
+        langWrap.classList.remove('is-open');
+        langTimer = setTimeout(() => { langMenu.hidden = true; }, 350);
+      }
+    };
+    langBtn.addEventListener('click', () => setLangOpen(langMenu.hidden));
+    document.addEventListener('click', (e) => { if (!langWrap.contains(e.target)) setLangOpen(false); });
+    langWrap.addEventListener('keydown', (e) => { if (e.key === 'Escape') { setLangOpen(false); langBtn.focus(); } });
+  }
+
   // ---------------- Always open at the top ----------------
   // Browsers restore the last scroll position (and jump to any #section in the
   // address) on reload. The site always starts at the top with the intro.
