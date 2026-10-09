@@ -23,7 +23,7 @@ Open **Command Prompt** and run:
 cd %USERPROFILE%\Documents
 git clone -b claude/dofida-animated-website-cpt52z https://github.com/layobaiju/dofida-website.git "dofida-website"
 cd dofida-website
-npm install
+npm ci
 copy .env.example .env
 notepad .env
 ```
@@ -44,9 +44,11 @@ Open http://localhost:3000 in your browser. The admin dashboard is at http://loc
 ```bat
 cd %USERPROFILE%\Documents\dofida-website
 git pull
-npm install
+npm ci
 npm start
 ```
+
+Use `npm ci` (not `npm install`) for updates: it installs exactly what's in `package-lock.json` without changing that file, so `git pull` never gets blocked. If `git pull` says *"Your local changes to the following files would be overwritten: package-lock.json"*, run `git checkout -- package-lock.json` and pull again.
 
 **Send your own changes to GitHub** (if you edit files yourself)
 
