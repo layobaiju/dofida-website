@@ -33,6 +33,18 @@ const admin = (p, opts = {}) => fetch(`${base}/api/admin${p}`, { ...opts, header
 test('additional nursery is 50% of the first nursery price', () => {
   assert.equal(pricing.firstNursery, 20400);
   assert.equal(pricing.additionalNursery, 10200);
+  assert.equal(pricing.monthly, 199);
+});
+
+test('animated brochure page renders with prices filled in', async () => {
+  const res = await fetch(`${base}/brochure`);
+  assert.equal(res.status, 200);
+  const html = await res.text();
+  assert.doesNotMatch(html, /\{\{\w+\}\}/);
+  assert.match(html, /data-monthly="199"/);
+  assert.match(html, /all of Kerala and Karnataka/);
+  assert.match(html, /\/js\/brochure\.js\?v=/);
+  assert.equal((await fetch(`${base}/js/brochure.js`)).status, 200);
 });
 
 test('home page renders with prices filled in and security headers', async () => {
@@ -41,6 +53,9 @@ test('home page renders with prices filled in and security headers', async () =>
   const html = await res.text();
   assert.match(html, /₹20,400/);
   assert.match(html, /₹10,200/);
+  assert.match(html, /₹199/);
+  assert.match(html, /id="services"/);
+  assert.match(html, /src="\/brochure\?embed=1"/);
   assert.doesNotMatch(html, /\{\{\w+\}\}/, 'no unreplaced template tokens');
   assert.match(res.headers.get('content-security-policy'), /script-src 'self'/);
   assert.equal(res.headers.get('x-powered-by'), null);
@@ -74,6 +89,7 @@ test('quote endpoint applies the multi-nursery discount', async () => {
   const three = await (await fetch(`${base}/api/quote?nurseries=3`)).json();
   assert.equal(three.total, 20400 + 2 * 10200);
   assert.equal(three.savings, 2 * 10200);
+  assert.equal(three.monthly, 199);
   assert.equal((await fetch(`${base}/api/quote?nurseries=0`)).status, 400);
 });
 
@@ -84,7 +100,7 @@ test('brochure downloads as a multi-page PDF and is counted', async () => {
   assert.match(res.headers.get('content-disposition'), /attachment; filename="Dofida-Plant-Bill-Brochure.pdf"/);
   const buf = Buffer.from(await res.arrayBuffer());
   assert.equal(buf.subarray(0, 5).toString(), '%PDF-');
-  assert.ok((buf.toString('latin1').match(/\/Type \/Page\b/g) || []).length >= 6);
+  assert.ok((buf.toString('latin1').match(/\/Type \/Page\b/g) || []).length >= 8);
   await store.flush();
   assert.equal(store.stats().downloads, 1);
 });

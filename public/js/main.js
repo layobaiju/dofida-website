@@ -101,7 +101,7 @@
   const words = $('[data-words]');
   let wordEls = [];
   if (words) {
-    const accent = new Set(['greenery,', 'bill', 'print', 'faster,', 'instantly']);
+    const accent = new Set(['websites,', 'apps,', 'Plant', 'Bill', 'faster,', 'instantly']);
     words.innerHTML = words.textContent.trim().split(/\s+/)
       .map((w) => `<span class="w${accent.has(w) ? ' is-accent' : ''}">${w}</span>`).join(' ');
     wordEls = $$('.w', words);
@@ -213,13 +213,14 @@
   function countUp(el) {
     const target = parseFloat(el.dataset.count);
     const suffix = el.dataset.suffix || '';
-    if (reduceMotion) { el.textContent = target + suffix; return; }
+    const prefix = el.dataset.prefix || '';
+    if (reduceMotion) { el.textContent = prefix + target + suffix; return; }
     const start = performance.now();
     const dur = 1400;
     (function frame(now) {
       const t = clamp((now - start) / dur, 0, 1);
       const eased = 1 - Math.pow(1 - t, 4);
-      el.textContent = Math.round(target * eased) + suffix;
+      el.textContent = prefix + Math.round(target * eased) + suffix;
       if (t < 1) requestAnimationFrame(frame);
     })(start);
   }
@@ -477,12 +478,13 @@
   const formEstimate = $('#formEstimate');
   const first = Number(calc?.dataset.first) || 0;
   const additional = Number(calc?.dataset.additional) || 0;
+  const monthly = Number(calc?.dataset.monthly) || 0;
   const quote = (n) => first + Math.max(0, n - 1) * additional;
 
   if (calc) {
     const range = $('#calcRange');
     const out = $('#calcCount');
-    const shown = { total: first };
+    const shown = { calcTotal: first };
     const tweens = {};
     function tween(id, to) {
       const el = document.getElementById(id);
@@ -505,8 +507,10 @@
       tween('calcExtra', (n - 1) * additional);
       tween('calcSave', (n - 1) * (first - additional));
       tween('calcTotal', quote(n));
+      tween('calcYear', quote(n) + 12 * monthly);
       out.animate?.([{ transform: 'scale(1.25)' }, { transform: 'scale(1)' }], { duration: 300, easing: 'ease-out' });
     }
+    update(1);
     range.addEventListener('input', () => update(range.valueAsNumber));
     $$('.calc__step', calc).forEach((b) => b.addEventListener('click', () => update(range.valueAsNumber + Number(b.dataset.step))));
     $('#calcEnquire').addEventListener('click', () => {
@@ -522,86 +526,20 @@
   }
   formNurseries?.addEventListener('input', updateEstimate);
 
+  // The Plant Bill estimate only shows when Plant Bill is what they're asking about.
+  const estimateWrap = $('#formEstimateWrap');
+  const syncEstimate = () => {
+    const v = $('input[name="interest"]:checked')?.value;
+    if (estimateWrap) estimateWrap.style.visibility = v === 'plant-bill' || v === 'pricing' ? 'visible' : 'hidden';
+  };
+  $$('input[name="interest"]').forEach((r) => r.addEventListener('change', syncEstimate));
+
   function setInterest(value) {
-    const radio = $(`input[name="interest"][value="${value}"]`);
+    const radio = $(`input[name="interest"][value="${value}"]`) || $('input[name="interest"][value="plant-bill"]');
     if (radio) radio.checked = true;
+    syncEstimate();
   }
   $$('[data-interest]').forEach((a) => a.addEventListener('click', () => setInterest(a.dataset.interest)));
-
-  // ---------------- Slide deck ----------------
-  const deck = $('#deck');
-  if (deck) {
-    const slides = $$('.slide', deck);
-    const dots = $('#deckDots');
-    const count = $('#deckCount');
-    const bar = $('#deckProgress');
-    const DUR = 6000;
-    let index = 0;
-    let timer = null;
-    let inView = false;
-    let paused = false;
-
-    slides.forEach((_, i) => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.setAttribute('aria-label', `Go to slide ${i + 1}`);
-      b.addEventListener('click', () => go(i));
-      dots.appendChild(b);
-    });
-
-    function go(i, dir) {
-      const next = (i + slides.length) % slides.length;
-      if (next === index && slides[index].classList.contains('is-active')) { schedule(); return; }
-      deck.classList.toggle('is-back', dir === -1 || (dir === undefined && next < index));
-      slides.forEach((s) => s.classList.remove('is-leaving'));
-      slides[index].classList.add('is-leaving');
-      slides[index].classList.remove('is-active');
-      const leaving = slides[index];
-      setTimeout(() => leaving.classList.remove('is-leaving'), 1000);
-      index = next;
-      slides[index].classList.add('is-active');
-      render();
-      schedule();
-    }
-    function render() {
-      $$('button', dots).forEach((b, i) => b.classList.toggle('is-active', i === index));
-      count.textContent = `${String(index + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
-      slides.forEach((s, i) => s.setAttribute('aria-hidden', String(i !== index)));
-    }
-    function schedule() {
-      clearTimeout(timer);
-      bar.classList.remove('is-running');
-      bar.style.transform = 'scaleX(0)';
-      if (!inView || paused || reduceMotion) return;
-      void bar.offsetWidth; // restart the CSS transition
-      bar.style.setProperty('--dur', `${DUR}ms`);
-      bar.style.transform = '';
-      bar.classList.add('is-running');
-      timer = setTimeout(() => go(index + 1, 1), DUR);
-    }
-
-    $('#deckPrev').addEventListener('click', () => go(index - 1, -1));
-    $('#deckNext').addEventListener('click', () => go(index + 1, 1));
-    deck.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight') go(index + 1, 1);
-      if (e.key === 'ArrowLeft') go(index - 1, -1);
-    });
-    deck.addEventListener('pointerenter', () => { paused = true; schedule(); });
-    deck.addEventListener('pointerleave', () => { paused = false; schedule(); });
-
-    let startX = null;
-    const stage = $('.deck__stage', deck);
-    stage.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, { passive: true });
-    stage.addEventListener('touchend', (e) => {
-      if (startX === null) return;
-      const dx = e.changedTouches[0].clientX - startX;
-      if (Math.abs(dx) > 40) go(index + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
-      startX = null;
-    });
-
-    new IntersectionObserver(([e]) => { inView = e.isIntersecting; schedule(); }, { threshold: 0.4 }).observe(deck);
-    render();
-  }
 
   // ---------------- Enquiry form ----------------
   const form = $('#enquiryForm');
@@ -657,6 +595,7 @@
         toast('Enquiry sent. We will be in touch soon');
         form.reset();
         updateEstimate();
+        syncEstimate();
       } catch (err) {
         status.textContent = `${err.message} Please try again.`;
       } finally {

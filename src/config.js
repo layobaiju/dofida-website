@@ -6,6 +6,7 @@ const company = {
   name: 'Dofida',
   legalName: 'Dofida Group',
   tagline: 'Software that grows with your nursery',
+  serviceArea: 'all of Kerala and Karnataka',
   locations: [
     { city: 'Calicut', region: 'Kerala', note: 'Office' },
     { city: 'Hunsur', region: 'Karnataka', note: 'Office' },
@@ -26,12 +27,15 @@ const pricing = {
   get additionalNursery() {
     return Math.round(this.firstNursery * (1 - this.additionalDiscountPercent / 100));
   },
+  // One subscription per owner, the same no matter how many nurseries they run.
+  monthly: 199,
   includes: [
     'Plant Bill app licence (Android & iOS)',
     'Billing printer, included in the price',
     'Setup and onboarding with your plant list',
     'Training for you and your staff',
   ],
+  monthlyIncludes: 'One flat monthly subscription covers all your nurseries',
 };
 
 const product = {

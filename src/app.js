@@ -7,6 +7,7 @@ const { buildBrochure } = require('./brochure');
 
 const PUBLIC = path.join(__dirname, '..', 'public');
 const STATUSES = ['new', 'contacted', 'demo', 'won', 'closed'];
+const INTERESTS = ['plant-bill', 'website', 'maintenance', 'app', 'ecommerce', 'software', 'demo', 'pricing', 'other'];
 const BROCHURE_NAME = 'Dofida-Plant-Bill-Brochure.pdf';
 // `npm run dev` (node --watch) re-reads pages on every request; otherwise they are cached.
 const DEV = process.execArgv.includes('--watch') || process.env.NODE_ENV === 'development';
@@ -34,8 +35,9 @@ function renderPage(file) {
   return versionAssets(fs.readFileSync(path.join(PUBLIC, file), 'utf8'));
 }
 
-function renderIndex() {
-  const tpl = renderPage('index.html');
+// Fills {{TOKENS}} from config, so prices and contact details always match the PDF.
+function renderTemplate(file) {
+  const tpl = renderPage(file);
   const contactLines = [
     company.contact.phone && `<a href="tel:${escapeHtml(company.contact.phone.replace(/\s/g, ''))}">${escapeHtml(company.contact.phone)}</a>`,
     company.contact.whatsapp && `<a href="https://wa.me/${escapeHtml(company.contact.whatsapp.replace(/\D/g, ''))}" target="_blank" rel="noopener">WhatsApp ${escapeHtml(company.contact.whatsapp)}</a>`,
@@ -47,6 +49,8 @@ function renderIndex() {
     PRICE_FIRST_RAW: String(pricing.firstNursery),
     PRICE_ADDITIONAL_RAW: String(pricing.additionalNursery),
     DISCOUNT: String(pricing.additionalDiscountPercent),
+    MONTHLY: formatINR(pricing.monthly),
+    MONTHLY_RAW: String(pricing.monthly),
     CONTACT_LINES: contactLines.join(''),
     YEAR: String(new Date().getFullYear()),
   };
@@ -93,7 +97,7 @@ function validateEnquiry(body) {
   if (!/^[+\d][\d\s-]{6,18}$/.test(e.phone) || e.phone.replace(/\D/g, '').length < 7) errors.phone = 'Please enter a valid phone number.';
   if (e.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.email)) errors.email = 'That email address does not look right.';
   if (e.nurseries < 1 || e.nurseries > 500) errors.nurseries = 'Number of nurseries should be between 1 and 500.';
-  if (!['plant-bill', 'demo', 'pricing', 'other'].includes(e.interest)) e.interest = 'plant-bill';
+  if (!INTERESTS.includes(e.interest)) e.interest = 'plant-bill';
   return { enquiry: e, errors };
 }
 
@@ -123,10 +127,10 @@ function createApp({ store, adminToken = process.env.ADMIN_TOKEN, notify } = {})
   app.use((req, res, next) => {
     res.set({
       'Content-Security-Policy':
-        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'",
       'X-Content-Type-Options': 'nosniff',
       'Referrer-Policy': 'strict-origin-when-cross-origin',
-      'X-Frame-Options': 'DENY',
+      'X-Frame-Options': 'SAMEORIGIN',
       'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
     });
     next();
@@ -141,12 +145,13 @@ function createApp({ store, adminToken = process.env.ADMIN_TOKEN, notify } = {})
     if (!pages[name] || DEV) pages[name] = render();
     res.set('Cache-Control', 'no-cache').type('html').send(pages[name]);
   };
-  const sendIndex = page('index', renderIndex);
+  const sendIndex = page('index', () => renderTemplate('index.html'));
   app.get(['/', '/index.html'], sendIndex);
 
   app.use('/fonts/outfit', express.static(path.join(path.dirname(require.resolve('@fontsource/outfit/package.json')), 'files'), { maxAge: '30d', immutable: true }));
   app.use('/fonts/inter', express.static(path.join(path.dirname(require.resolve('@fontsource/inter/package.json')), 'files'), { maxAge: '30d', immutable: true }));
   app.use(express.static(PUBLIC, { index: false, maxAge: DEV ? 0 : '1h' }));
+  app.get('/brochure', page('brochure', () => renderTemplate('brochure.html')));
   app.get('/admin', page('admin', () => renderPage('admin.html')));
 
   // ----- public API -----
@@ -162,6 +167,7 @@ function createApp({ store, adminToken = process.env.ADMIN_TOKEN, notify } = {})
         firstNursery: pricing.firstNursery,
         additionalNursery: pricing.additionalNursery,
         additionalDiscountPercent: pricing.additionalDiscountPercent,
+        monthly: pricing.monthly,
         includes: pricing.includes,
       },
     });
@@ -170,7 +176,7 @@ function createApp({ store, adminToken = process.env.ADMIN_TOKEN, notify } = {})
   app.get('/api/quote', (req, res) => {
     const n = parseInt(req.query.nurseries, 10);
     if (!Number.isInteger(n) || n < 1 || n > 500) return res.status(400).json({ error: 'nurseries must be between 1 and 500' });
-    res.json({ nurseries: n, total: quote(n), savings: (n - 1) * (pricing.firstNursery - pricing.additionalNursery) });
+    res.json({ nurseries: n, total: quote(n), monthly: pricing.monthly, savings: (n - 1) * (pricing.firstNursery - pricing.additionalNursery) });
   });
 
   let brochure = null;

@@ -1,15 +1,14 @@
 # Dofida Group website
 
-The website for **Dofida Group** and its product **Plant Bill**: billing software for plant nurseries that runs on Android and iOS and comes with a billing printer.
+The website for **Dofida Group**. We build and maintain websites, mobile apps, e-commerce stores and custom software for every kind of business, and make **Plant Bill**: billing software for plant nurseries that runs on Android and iOS and comes with a billing printer. Serving all of Kerala and Karnataka from offices in Calicut and Hunsur.
 
-- Animated landing page: a split-down intro that reveals the Dofida logo, then the product, features, pricing, slides and locations
-- Pricing calculator: ₹20,400 for the first nursery and 50% off (₹10,200) for each extra nursery under the same owner, printer included in both
-- In-page slide deck plus a **downloadable PDF brochure** generated from the same data
+- Animated landing page with a dark split-down intro, services, Plant Bill product, features, compare slider, pricing, brochure, locations, FAQ and enquiry form
+- Plant Bill pricing: ₹20,400 for the first nursery, 50% off (₹10,200) for each extra nursery under the same owner, printer included, plus ₹199/month for all nurseries
+- **Animated brochure** at `/brochure` (also embedded on the home page): swipeable, keyboard and touch friendly, works on phones, fold phones, tablets and computers
+- **Downloadable PDF brochure** generated from the same data
 - **Enquiry form** backed by an API, with validation, spam protection and rate limiting
 - **Admin dashboard** at `/admin` to read enquiries, set their status, add notes and export CSV
-- Offices: Calicut, Kerala and Hunsur, Karnataka
-- Dark Midnight theme by default (dark everywhere, including slides and mockups), plus Paper and Sage themes with a circular reveal when switching; the choice is remembered
-- Drag-to-compare "bill book vs Plant Bill" slider, FAQ, back-to-top progress ring and toast messages
+- Dark Midnight theme by default, plus Paper and Sage themes; the same fonts (Outfit + Inter) and colours across the site, brochure and PDF
 
 ## Run it on your computer (Windows)
 
