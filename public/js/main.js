@@ -91,6 +91,10 @@
     wordEls = $$('.w', words);
   }
 
+  const clipSections = $$('.reveal-clip');
+  const toTop = $('#toTop');
+  const footerBig = $('.footer__big');
+
   let lastY = scrollY;
   let ticking = false;
   function onScroll() {
@@ -115,6 +119,27 @@
       wordEls.forEach((w, i) => w.classList.toggle('is-lit', i < lit));
     }
 
+    // dark sections open from an inset rounded card to full width
+    if (!reduceMotion) {
+      clipSections.forEach((sec) => {
+        const r = sec.getBoundingClientRect();
+        if (r.top > innerHeight || r.bottom < 0) return;
+        const p = clamp((innerHeight - r.top) / (innerHeight * 0.7), 0, 1);
+        sec.style.setProperty('--ci', `${((1 - p) * 5).toFixed(2)}%`);
+        sec.style.setProperty('--cr', `${((1 - p) * 48).toFixed(1)}px`);
+      });
+      if (footerBig) {
+        const r = footerBig.getBoundingClientRect();
+        // slides up into place as the footer arrives; never rises above its resting spot
+        if (r.top < innerHeight * 1.2) footerBig.style.setProperty('--fy', `${clamp((r.top - innerHeight * 0.55) * 0.3, 0, 140).toFixed(1)}px`);
+      }
+    }
+
+    if (toTop) {
+      toTop.classList.toggle('is-on', y > innerHeight);
+      toTop.style.setProperty('--ring', (145 - 145 * (max > 0 ? y / max : 0)).toFixed(1));
+    }
+
     if (steps) {
       const r = steps.getBoundingClientRect();
       const p = clamp((innerHeight * 0.8 - r.top) / (r.height + innerHeight * 0.3), 0, 1);
@@ -127,6 +152,36 @@
   }, { passive: true });
   addEventListener('resize', onScroll);
   onScroll();
+
+  // ---------------- Split headings into words ----------------
+  // Each word gets its own masked span so it can rise in, staggered.
+  $$('.h2[data-reveal]').forEach((h) => {
+    let i = 0;
+    const walk = (node) => {
+      [...node.childNodes].forEach((child) => {
+        if (child.nodeType === Node.TEXT_NODE) {
+          const frag = document.createDocumentFragment();
+          child.textContent.split(/(\s+)/).forEach((part) => {
+            if (!part) return;
+            if (/^\s+$/.test(part)) { frag.append(' '); return; }
+            const w = document.createElement('span');
+            w.className = 'w';
+            const inner = document.createElement('span');
+            inner.textContent = part;
+            inner.style.setProperty('--wi', i++);
+            w.append(inner);
+            frag.append(w);
+          });
+          child.replaceWith(frag);
+        } else if (child.nodeType === Node.ELEMENT_NODE && child.tagName !== 'BR') {
+          walk(child);
+        }
+      });
+    };
+    h.setAttribute('aria-label', h.textContent.replace(/\s+/g, ' ').trim());
+    walk(h);
+    h.classList.add('is-split');
+  });
 
   // ---------------- Reveal + counters ----------------
   const revealObserver = new IntersectionObserver((entries) => {
@@ -168,7 +223,7 @@
       requestAnimationFrame(loop);
     })();
     document.addEventListener('pointerover', (e) => {
-      cursor.classList.toggle('is-hover', !!e.target.closest('a, button, input, textarea, label, .card'));
+      cursor.classList.toggle('is-hover', !!e.target.closest('a, button, input, textarea, label, .card, .compare__stage'));
     });
 
     $$('.magnetic').forEach((btn) => {
@@ -204,6 +259,123 @@
     });
     hero.addEventListener('pointerleave', () => { star.style.transform = ''; });
   }
+
+  // ---------------- Buttons: fill from the pointer, ripple on click ----------------
+  document.addEventListener('pointerover', (e) => {
+    const btn = e.target.closest?.('.btn');
+    if (!btn || btn.contains(e.relatedTarget)) return;
+    const r = btn.getBoundingClientRect();
+    btn.style.setProperty('--hx', `${((e.clientX - r.left) / r.width) * 100}%`);
+    btn.style.setProperty('--hy', `${((e.clientY - r.top) / r.height) * 100}%`);
+  });
+  document.addEventListener('pointerdown', (e) => {
+    const btn = e.target.closest?.('.btn');
+    if (!btn || reduceMotion) return;
+    const r = btn.getBoundingClientRect();
+    const dot = document.createElement('span');
+    dot.className = 'ripple';
+    dot.style.left = `${e.clientX - r.left}px`;
+    dot.style.top = `${e.clientY - r.top}px`;
+    btn.appendChild(dot);
+    dot.addEventListener('animationend', () => dot.remove());
+  });
+
+  // ---------------- Toast ----------------
+  const toastEl = $('#toast');
+  let toastTimer;
+  function toast(msg) {
+    if (!toastEl) return;
+    $('span', toastEl).textContent = msg;
+    toastEl.classList.add('is-on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('is-on'), 3200);
+  }
+  $$('a[href^="/api/brochure"][download]').forEach((a) => a.addEventListener('click', () => toast('Your Plant Bill brochure is downloading')));
+
+  // ---------------- Back to top ----------------
+  $('#toTop')?.addEventListener('click', () => scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }));
+
+  // ---------------- Theme picker ----------------
+  const themeWrap = $('#theme');
+  if (themeWrap) {
+    const btn = $('#themeBtn');
+    const options = $$('[data-theme-value]', themeWrap);
+    const names = { paper: 'Paper', midnight: 'Midnight', sage: 'Sage' };
+    const current = () => document.documentElement.getAttribute('data-theme') || 'paper';
+    const sync = () => {
+      options.forEach((o) => o.setAttribute('aria-checked', String(o.dataset.themeValue === current())));
+      const meta = $('meta[name="theme-color"]');
+      if (meta) meta.content = getComputedStyle(document.body).backgroundColor;
+    };
+    const setOpen = (open) => {
+      themeWrap.classList.toggle('is-open', open);
+      btn.setAttribute('aria-expanded', String(open));
+    };
+    const apply = (theme) => {
+      if (theme === 'paper') document.documentElement.removeAttribute('data-theme');
+      else document.documentElement.setAttribute('data-theme', theme);
+      try { localStorage.setItem('dofida-theme', theme); } catch { /* storage blocked */ }
+    };
+
+    btn.addEventListener('click', () => setOpen(!themeWrap.classList.contains('is-open')));
+    document.addEventListener('click', (e) => { if (!themeWrap.contains(e.target)) setOpen(false); });
+    themeWrap.addEventListener('keydown', (e) => { if (e.key === 'Escape') { setOpen(false); btn.focus(); } });
+
+    options.forEach((o) => o.addEventListener('click', (e) => {
+      const theme = o.dataset.themeValue;
+      setOpen(false);
+      if (theme === current()) return;
+      const done = () => { sync(); toast(`${names[theme]} theme on`); };
+      // Circular reveal from the click point, where the browser supports it.
+      if (!document.startViewTransition || reduceMotion) { apply(theme); done(); return; }
+      const r = btn.getBoundingClientRect();
+      const x = e.clientX || r.left + r.width / 2;
+      const y = e.clientY || r.top + r.height / 2;
+      const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+      const vt = document.startViewTransition(() => apply(theme));
+      vt.ready.then(() => {
+        document.documentElement.animate(
+          { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+          { duration: 750, easing: 'cubic-bezier(.76, 0, .24, 1)', pseudoElement: '::view-transition-new(root)' },
+        );
+      }).catch(() => {});
+      vt.finished.then(done, done);
+    }));
+    sync();
+  }
+
+  // ---------------- Compare slider ----------------
+  const compareStage = $('#compareStage');
+  if (compareStage) {
+    const range = $('#compareRange');
+    const wrap = $('#compare-slider');
+    const set = (v) => compareStage.style.setProperty('--pos', `${v}%`);
+    range.addEventListener('input', () => { wrap.classList.add('is-touched'); set(range.value); });
+    // Gentle sweep the first time it scrolls into view, to show it can be dragged.
+    new IntersectionObserver(([e], obs) => {
+      if (!e.isIntersecting || reduceMotion) return;
+      obs.disconnect();
+      const start = performance.now();
+      (function frame(now) {
+        if (wrap.classList.contains('is-touched')) return;
+        const t = clamp((now - start) / 2200, 0, 1);
+        const v = 50 + Math.sin(t * Math.PI * 2) * 22 * (1 - t);
+        set(v.toFixed(1)); range.value = v;
+        if (t < 1) requestAnimationFrame(frame);
+      })(start);
+    }, { threshold: 0.5 }).observe(compareStage);
+  }
+
+  // ---------------- FAQ accordion ----------------
+  $$('.faq__item').forEach((item) => {
+    const q = $('.faq__q', item);
+    q.addEventListener('click', () => {
+      const open = !item.classList.contains('is-open');
+      $$('.faq__item.is-open').forEach((o) => { o.classList.remove('is-open'); $('.faq__q', o).setAttribute('aria-expanded', 'false'); });
+      item.classList.toggle('is-open', open);
+      q.setAttribute('aria-expanded', String(open));
+    });
+  });
 
   // ---------------- Billing demo (phone + printer) ----------------
   const demo = $('#demo');
@@ -457,6 +629,7 @@
           throw new Error(body.error || 'Could not send your enquiry.');
         }
         done.hidden = false;
+        toast('Enquiry sent. We will be in touch soon');
         form.reset();
         updateEstimate();
       } catch (err) {

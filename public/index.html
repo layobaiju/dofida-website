@@ -11,6 +11,7 @@
   <meta property="og:type" content="website">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="/fonts/outfit/outfit-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <script src="/js/theme.js"></script>
   <link rel="stylesheet" href="/css/style.css">
   <script src="/js/main.js" defer></script>
 </head>
@@ -45,17 +46,28 @@
 <!-- ============ NAV ============ -->
 <header class="nav" id="nav">
   <a class="nav__brand" href="#top" aria-label="Dofida Group home">
-    <img src="/img/logo-mark.svg" alt="" width="28" height="28">
+    <svg viewBox="0 0 100 100" fill="none" aria-hidden="true"><defs><clipPath id="navL"><rect width="50" height="100"/></clipPath><clipPath id="navR"><rect x="50" width="50" height="100"/></clipPath></defs><path clip-path="url(#navL)" class="star-fill" d="M50 9 L61.17 37.63 L91.85 39.4 L68.07 58.87 L75.86 88.6 L50 72 L24.14 88.6 L31.93 58.87 L8.15 39.4 L38.83 37.63 Z"/><path clip-path="url(#navR)" class="star-line" d="M50 9 L61.17 37.63 L91.85 39.4 L68.07 58.87 L75.86 88.6 L50 72 L24.14 88.6 L31.93 58.87 L8.15 39.4 L38.83 37.63 Z"/></svg>
     <span>Dofida</span>
   </a>
   <nav class="nav__links" id="navLinks" aria-label="Main">
-    <a href="#product">Plant Bill</a>
-    <a href="#features">Features</a>
-    <a href="#pricing">Pricing</a>
-    <a href="#slides">Brochure</a>
-    <a href="#locations">Find us</a>
+    <a href="#product"><span class="roll"><span>Plant Bill</span><span aria-hidden="true">Plant Bill</span></span></a>
+    <a href="#features"><span class="roll"><span>Features</span><span aria-hidden="true">Features</span></span></a>
+    <a href="#pricing"><span class="roll"><span>Pricing</span><span aria-hidden="true">Pricing</span></span></a>
+    <a href="#slides"><span class="roll"><span>Brochure</span><span aria-hidden="true">Brochure</span></span></a>
+    <a href="#locations"><span class="roll"><span>Find us</span><span aria-hidden="true">Find us</span></span></a>
+    <a href="#faq"><span class="roll"><span>FAQ</span><span aria-hidden="true">FAQ</span></span></a>
     <a class="btn btn--sm btn--ink nav__cta" href="#enquire">Enquire</a>
   </nav>
+  <div class="theme" id="theme">
+    <button class="theme__btn" id="themeBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="themeMenu" aria-label="Change theme">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+    <ul class="theme__menu" id="themeMenu" role="menu" aria-label="Theme">
+      <li><button type="button" role="menuitemradio" data-theme-value="paper" aria-checked="false"><span class="swatch" style="--a:#141A2E;--b:#EFEEEA;--c:#6E8EEA"></span><span><b>Paper</b><small>Light and calm, the brand look</small></span></button></li>
+      <li><button type="button" role="menuitemradio" data-theme-value="midnight" aria-checked="false"><span class="swatch" style="--a:#0B0F1C;--b:#182036;--c:#8AA4F2"></span><span><b>Midnight</b><small>Dark, easy on the eyes</small></span></button></li>
+      <li><button type="button" role="menuitemradio" data-theme-value="sage" aria-checked="false"><span class="swatch" style="--a:#173A2C;--b:#ECF0E8;--c:#3F8F6B"></span><span><b>Sage</b><small>Nursery green</small></span></button></li>
+    </ul>
+  </div>
   <button class="nav__toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks"><span></span><span></span></button>
 </header>
 
@@ -69,9 +81,10 @@
     <div class="blob blob--blue"></div>
     <div class="leaves"></div>
   </div>
+  <div class="hero__frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
 
   <div class="hero__inner">
-    <p class="eyebrow hero__eyebrow" data-hero>Calicut · Hunsur · India</p>
+    <p class="hero__badge" data-hero><span class="dot-live"></span><b>New</b> Plant Bill for nurseries<span class="hide-sm"> · Calicut &amp; Hunsur</span></p>
     <h1 class="hero__brand" aria-label="Dofida Group">
       <span class="hero__split hero__split--l" data-parallax="-0.04">
         <svg class="hero__star" viewBox="0 0 100 100" fill="none" aria-hidden="true">
@@ -84,7 +97,7 @@
         </svg>
       </span>
       <span class="hero__split hero__split--r" data-parallax="0.04">
-        <span class="hero__word" aria-hidden="true">Dofida</span>
+        <span class="hero__word" aria-hidden="true"><span>D</span><span>o</span><span>f</span><span>i</span><span>d</span><span>a</span></span>
         <span class="hero__group" aria-hidden="true">GROUP</span>
       </span>
     </h1>
@@ -99,16 +112,23 @@
 </section>
 
 <!-- ============ MARQUEE ============ -->
-<div class="marquee" aria-hidden="true">
+<div class="marquee on-contrast" aria-hidden="true">
   <div class="marquee__track">
     <span>Plant Bill</span><i>✦</i><span>Android</span><i>✦</i><span>iOS</span><i>✦</i><span>Printer included</span><i>✦</i><span>Made for nurseries</span><i>✦</i><span>Calicut</span><i>✦</i><span>Hunsur</span><i>✦</i>
     <span>Plant Bill</span><i>✦</i><span>Android</span><i>✦</i><span>iOS</span><i>✦</i><span>Printer included</span><i>✦</i><span>Made for nurseries</span><i>✦</i><span>Calicut</span><i>✦</i><span>Hunsur</span><i>✦</i>
   </div>
 </div>
 
+<div class="marquee marquee--alt" aria-hidden="true">
+  <div class="marquee__track">
+    <span>Bill faster</span><i>✦</i><span>Print instantly</span><i>✦</i><span>Know your sales</span><i>✦</i><span>Grow more nurseries</span><i>✦</i><span>Bill faster</span><i>✦</i><span>Print instantly</span><i>✦</i><span>Know your sales</span><i>✦</i><span>Grow more nurseries</span><i>✦</i>
+    <span>Bill faster</span><i>✦</i><span>Print instantly</span><i>✦</i><span>Know your sales</span><i>✦</i><span>Grow more nurseries</span><i>✦</i><span>Bill faster</span><i>✦</i><span>Print instantly</span><i>✦</i><span>Know your sales</span><i>✦</i><span>Grow more nurseries</span><i>✦</i>
+  </div>
+</div>
+
 <!-- ============ ABOUT ============ -->
 <section class="about section" id="about">
-  <p class="eyebrow" data-reveal>About Dofida</p>
+  <p class="eyebrow" data-num="01" data-reveal>About Dofida</p>
   <p class="about__statement" data-words>We build simple, dependable software for the people who grow India's greenery, so every nursery can bill faster, print instantly and know exactly how the day went.</p>
   <div class="about__facts">
     <div class="fact" data-reveal><b data-count="2">0</b><span>platforms<br>Android &amp; iOS</span></div>
@@ -118,10 +138,12 @@
   </div>
 </section>
 
+<div class="divider" data-reveal aria-hidden="true"></div>
+
 <!-- ============ PRODUCT ============ -->
 <section class="product section" id="product">
   <div class="product__copy">
-    <p class="eyebrow" data-reveal>Our product</p>
+    <p class="eyebrow" data-num="02" data-reveal>Our product</p>
     <h2 class="h2" data-reveal>Plant Bill.<br><span class="muted">Billing, built for nurseries.</span></h2>
     <p class="lead" data-reveal>Bill your customers from your phone, print the receipt on the printer that comes with it, and keep every sale on record. No computer, no counter setup, no fuss.</p>
     <div class="platforms" data-reveal>
@@ -138,7 +160,7 @@
     <div class="demo" id="demo">
       <div class="phone">
         <div class="phone__notch"></div>
-        <div class="phone__screen">
+        <div class="phone__screen scope-paper">
           <div class="app__bar"><img src="/img/logo-mark.svg" alt="" width="18" height="18"><b>Plant Bill</b><span class="app__dot"></span></div>
           <div class="app__customer">Bill #<span id="billNo">1042</span></div>
           <ul class="app__items" id="appItems"></ul>
@@ -160,39 +182,47 @@
   </div>
 </section>
 
+<div class="divider" data-reveal aria-hidden="true"></div>
+
 <!-- ============ FEATURES ============ -->
 <section class="features section" id="features">
   <div class="section__head">
-    <p class="eyebrow" data-reveal>Features</p>
+    <p class="eyebrow" data-num="03" data-reveal>Features</p>
     <h2 class="h2" data-reveal>Everything a nursery<br>counter needs.</h2>
   </div>
   <div class="features__grid">
-    <article class="card" data-reveal>
+    <article class="card beam" data-reveal>
+      <span class="card__num">01</span>
       <div class="card__icon"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></div>
       <h3>Bill in seconds</h3>
       <p>Pick plants from your own catalogue, set quantities and print a clean bill while the customer waits.</p>
     </article>
-    <article class="card" data-reveal>
+    <article class="card beam" data-reveal>
+      <span class="card__num">02</span>
       <div class="card__icon"><svg viewBox="0 0 24 24"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M7 14h10v7H7z"/></svg></div>
       <h3>Printer included</h3>
       <p>Every package ships with a billing printer that pairs with your phone, so receipts come out on the spot.</p>
     </article>
-    <article class="card" data-reveal>
+    <article class="card beam" data-reveal>
+      <span class="card__num">03</span>
       <div class="card__icon"><svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg></div>
       <h3>Android &amp; iOS</h3>
       <p>Runs on the phones you and your staff already use, from budget Android handsets to iPhones.</p>
     </article>
-    <article class="card" data-reveal>
+    <article class="card beam" data-reveal>
+      <span class="card__num">04</span>
       <div class="card__icon"><svg viewBox="0 0 24 24"><path d="M12 21c-5-2-8-6-8-11 4 0 7 1.5 8 5 1-3.5 4-5 8-5 0 5-3 9-8 11zM12 15V8M12 8c0-2.5 1-4 3-5"/></svg></div>
       <h3>Your plant catalogue</h3>
       <p>Add every variety you sell with its own price and size, then find it fast when billing.</p>
     </article>
-    <article class="card" data-reveal>
+    <article class="card beam" data-reveal>
+      <span class="card__num">05</span>
       <div class="card__icon"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div>
       <h3>Sales at a glance</h3>
       <p>See what sold today, this week and this month, and which plants bring in the most.</p>
     </article>
-    <article class="card" data-reveal>
+    <article class="card beam" data-reveal>
+      <span class="card__num">06</span>
       <div class="card__icon"><svg viewBox="0 0 24 24"><path d="M3 21V10l5-4 5 4v11M13 21v-7l4-3 4 3v7M2 21h20M7 21v-4h2v4"/></svg></div>
       <h3>Many nurseries, one owner</h3>
       <p>Run several nurseries under one owner, with each extra nursery at {{DISCOUNT}}% off.</p>
@@ -200,10 +230,56 @@
   </div>
 </section>
 
+
+<!-- ============ COMPARE ============ -->
+<section class="compare-section section" id="compare">
+  <div class="section__head section__head--center">
+    <p class="eyebrow" data-num="04" data-reveal>Before &amp; after</p>
+    <h2 class="h2" data-reveal>Close the bill book.<br><span class="muted">Open Plant Bill.</span></h2>
+  </div>
+  <div class="compare" id="compare-slider" data-reveal="scale">
+    <div class="compare__stage" id="compareStage">
+      <div class="compare__side compare__side--old">
+        <span class="compare__label">Bill book</span>
+        <div class="compare__body">
+          <p class="compare__h">Writing it by hand</p>
+          <ul class="compare__list">
+            <li>Every bill written out by hand</li>
+            <li>Totals added up on paper</li>
+            <li>Hard-to-read copies for customers</li>
+            <li>Day's sales counted by flipping pages</li>
+          </ul>
+        </div>
+        <div class="compare__art" aria-hidden="true">
+          <div class="billbook">Areca palm 2 × 350<br>Money plant 3 × <s>110</s> 120<br>Hibiscus 1 × 180<br>Total = <u>1,2??</u></div>
+        </div>
+      </div>
+      <div class="compare__side compare__side--new">
+        <span class="compare__label">Plant Bill</span>
+        <div class="compare__art" aria-hidden="true">
+          <div class="receipt-static"><b>DOFIDA · PLANT BILL</b><div><span>Areca Palm ×2</span><span>700</span></div><div><span>Money Plant ×3</span><span>360</span></div><div><span>Hibiscus ×1</span><span>180</span></div><div class="t"><span>TOTAL</span><span>₹1,240</span></div></div>
+        </div>
+        <div class="compare__list-wrap">
+          <p class="compare__h">Billing with Plant Bill</p>
+          <ul class="compare__list">
+            <li>Pick plants from your catalogue</li>
+            <li>Totals worked out instantly</li>
+            <li>Clean printed receipt every time</li>
+            <li>Today's sales right on your phone</li>
+          </ul>
+        </div>
+      </div>
+      <input class="compare__range" id="compareRange" type="range" min="0" max="100" value="50" aria-label="Drag to compare the bill book with Plant Bill">
+      <div class="compare__handle" aria-hidden="true"></div>
+    </div>
+    <p class="compare__hint">Drag the handle to compare</p>
+  </div>
+</section>
+
 <!-- ============ HOW IT WORKS ============ -->
-<section class="how section section--ink" id="how">
+<section class="how section section--ink on-contrast reveal-clip" id="how">
   <div class="section__head">
-    <p class="eyebrow" data-reveal>How it works</p>
+    <p class="eyebrow" data-num="05" data-reveal>How it works</p>
     <h2 class="h2" data-reveal>From enquiry to your<br>first printed bill.</h2>
   </div>
   <ol class="steps" id="steps">
@@ -217,12 +293,13 @@
 <!-- ============ PRICING ============ -->
 <section class="pricing section" id="pricing">
   <div class="section__head section__head--center">
-    <p class="eyebrow" data-reveal>Pricing</p>
+    <p class="eyebrow" data-num="06" data-reveal>Pricing</p>
     <h2 class="h2" data-reveal>One simple price.<br><span class="muted">Printer included.</span></h2>
   </div>
 
   <div class="pricing__cards">
-    <article class="price price--ink tilt" data-reveal>
+    <article class="price price--ink on-contrast beam beam--always tilt" data-reveal>
+      <span class="price__tag">Start here</span>
       <p class="price__label">First nursery</p>
       <p class="price__amount">₹<span>{{PRICE_FIRST}}</span></p>
       <p class="price__note">Plant Bill software + billing printer</p>
@@ -275,7 +352,7 @@
 <section class="slides section" id="slides">
   <div class="section__head section__head--split">
     <div>
-      <p class="eyebrow" data-reveal>Brochure</p>
+      <p class="eyebrow" data-num="07" data-reveal>Brochure</p>
       <h2 class="h2" data-reveal>Plant Bill, slide by slide.</h2>
     </div>
     <div class="slides__actions" data-reveal>
@@ -285,7 +362,7 @@
   </div>
 
   <div class="deck" id="deck" data-reveal tabindex="0" aria-roledescription="carousel" aria-label="Plant Bill brochure slides">
-    <div class="deck__stage">
+    <div class="deck__stage scope-paper">
 
       <div class="slide slide--cover is-active" aria-roledescription="slide" aria-label="1 of 6">
         <div class="slide__half slide__half--l"></div><div class="slide__half slide__half--r"></div>
@@ -362,9 +439,9 @@
 </section>
 
 <!-- ============ LOCATIONS ============ -->
-<section class="locations section section--ink" id="locations">
+<section class="locations section section--ink on-contrast reveal-clip" id="locations">
   <div class="section__head">
-    <p class="eyebrow" data-reveal>Find us</p>
+    <p class="eyebrow" data-num="08" data-reveal>Find us</p>
     <h2 class="h2" data-reveal>Rooted in Kerala<br>and Karnataka.</h2>
   </div>
   <div class="locations__wrap">
@@ -396,10 +473,29 @@
   </div>
 </section>
 
+<!-- ============ FAQ ============ -->
+<section class="faq section" id="faq">
+  <div class="section__head section__head--center">
+    <p class="eyebrow" data-num="09" data-reveal>Questions</p>
+    <h2 class="h2" data-reveal>Good to know.</h2>
+  </div>
+  <div class="faq__list" data-reveal>
+    <div class="faq__item"><button class="faq__q" type="button" aria-expanded="false">How much does Plant Bill cost?<span class="faq__icon" aria-hidden="true"></span></button><div class="faq__a"><div><p>₹{{PRICE_FIRST}} for your first nursery. That includes the Plant Bill software and a billing printer. Every extra nursery under the same owner is {{DISCOUNT}}% off, at ₹{{PRICE_ADDITIONAL}} each, also with a printer.</p></div></div></div>
+    <div class="faq__item"><button class="faq__q" type="button" aria-expanded="false">Is the printer really included?<span class="faq__icon" aria-hidden="true"></span></button><div class="faq__a"><div><p>Yes. Every nursery package comes with its own billing printer, so you can print a receipt for the customer as soon as you bill.</p></div></div></div>
+    <div class="faq__item"><button class="faq__q" type="button" aria-expanded="false">Which phones does it work on?<span class="faq__icon" aria-hidden="true"></span></button><div class="faq__a"><div><p>Plant Bill works on both Android phones and iPhones (iOS), so you and your staff can use the phones you already have.</p></div></div></div>
+    <div class="faq__item"><button class="faq__q" type="button" aria-expanded="false">I own more than one nursery. How does pricing work?<span class="faq__icon" aria-hidden="true"></span></button><div class="faq__a"><div><p>Your first nursery is ₹{{PRICE_FIRST}}. Each additional nursery you own is {{DISCOUNT}}% off, at ₹{{PRICE_ADDITIONAL}}. For example, 3 nurseries come to ₹{{PRICE_FIRST}} + 2 × ₹{{PRICE_ADDITIONAL}}. Use the calculator above for your exact total.</p></div></div></div>
+    <div class="faq__item"><button class="faq__q" type="button" aria-expanded="false">Will you help me set it up?<span class="faq__icon" aria-hidden="true"></span></button><div class="faq__a"><div><p>Yes. We install the app, load your plant list, pair the printer, and show you and your staff how to bill and check sales.</p></div></div></div>
+    <div class="faq__item"><button class="faq__q" type="button" aria-expanded="false">Where are you based?<span class="faq__icon" aria-hidden="true"></span></button><div class="faq__a"><div><p>Dofida Group has offices in Calicut, Kerala and Hunsur, Karnataka.</p></div></div></div>
+    <div class="faq__item"><button class="faq__q" type="button" aria-expanded="false">How do I get a demo?<span class="faq__icon" aria-hidden="true"></span></button><div class="faq__a"><div><p>Fill in the enquiry form below and we will call you back to arrange a demo.</p></div></div></div>
+  </div>
+</section>
+
+<div class="divider" data-reveal aria-hidden="true"></div>
+
 <!-- ============ ENQUIRY ============ -->
 <section class="enquire section" id="enquire">
   <div class="enquire__intro">
-    <p class="eyebrow" data-reveal>Enquire</p>
+    <p class="eyebrow" data-num="10" data-reveal>Enquire</p>
     <h2 class="h2" data-reveal>Let's get your<br>nursery billing.</h2>
     <p class="lead" data-reveal>Tell us a little about your nursery and we will call you back to arrange a demo and answer your questions.</p>
     <ul class="enquire__points" data-reveal>
@@ -439,11 +535,11 @@
     </div>
     <p class="form__status" id="formStatus" role="status" aria-live="polite"></p>
 
-    <div class="form__done" id="formDone" hidden>
+    <div class="form__done on-contrast" id="formDone" hidden>
       <svg viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/><path d="M15 27l7 7 15-15"/></svg>
       <h3>Thank you!</h3>
       <p>We have your enquiry and will be in touch soon.</p>
-      <button type="button" class="btn btn--ghost btn--sm" id="formAgain">Send another</button>
+      <button type="button" class="btn btn--light btn--sm" id="formAgain">Send another</button>
     </div>
   </form>
 </section>
@@ -451,11 +547,21 @@
 </main>
 
 <!-- ============ FOOTER ============ -->
-<footer class="footer">
+<button class="to-top" id="toTop" type="button" aria-label="Back to top"><svg viewBox="0 0 50 50" aria-hidden="true"><circle cx="25" cy="25" r="23"/></svg><b aria-hidden="true">↑</b></button>
+<div class="toast" id="toast" role="status" aria-live="polite"><i aria-hidden="true">✓</i><span></span></div>
+
+<footer class="footer on-contrast">
+  <div class="footer__cta">
+    <h2 data-reveal>Ready to bill smarter?</h2>
+    <div class="hero__ctas" data-reveal>
+      <a class="btn btn--light magnetic" href="#enquire">Send an enquiry <i class="arrow"></i></a>
+      <a class="btn btn--ghost" href="/api/brochure" download>Brochure <i class="dl"></i></a>
+    </div>
+  </div>
   <div class="footer__big" aria-hidden="true">Dofida</div>
   <div class="footer__cols">
     <div>
-      <a class="nav__brand" href="#top"><img src="/img/logo-mark.svg" alt="" width="28" height="28"><span>Dofida <small>GROUP</small></span></a>
+      <a class="nav__brand" href="#top"><svg viewBox="0 0 100 100" fill="none" aria-hidden="true"><defs><clipPath id="footL"><rect width="50" height="100"/></clipPath><clipPath id="footR"><rect x="50" width="50" height="100"/></clipPath></defs><path clip-path="url(#footL)" class="star-fill" d="M50 9 L61.17 37.63 L91.85 39.4 L68.07 58.87 L75.86 88.6 L50 72 L24.14 88.6 L31.93 58.87 L8.15 39.4 L38.83 37.63 Z"/><path clip-path="url(#footR)" class="star-line" d="M50 9 L61.17 37.63 L91.85 39.4 L68.07 58.87 L75.86 88.6 L50 72 L24.14 88.6 L31.93 58.87 L8.15 39.4 L38.83 37.63 Z"/></svg><span>Dofida <small>GROUP</small></span></a>
       <p class="footer__muted">Billing software for plant nurseries.</p>
     </div>
     <div>
@@ -468,10 +574,10 @@
     </div>
     <div>
       <p class="footer__h">Talk to us</p>
-      <a href="#enquire">Send an enquiry</a>
+      <a href="#enquire">Send an enquiry</a><a href="#faq">FAQ</a>
     </div>
   </div>
-  <p class="footer__copy">© {{YEAR}} Dofida Group. All rights reserved.</p>
+  <p class="footer__copy"><span>© {{YEAR}} Dofida Group. All rights reserved.</span><span>Made in Kerala &amp; Karnataka</span></p>
 </footer>
 
 </body>
