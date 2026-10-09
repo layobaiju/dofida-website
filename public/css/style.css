@@ -5,6 +5,12 @@
 @font-face { font-family: "Inter"; font-weight: 400; font-display: swap; src: url(/fonts/inter/inter-latin-400-normal.woff2) format("woff2"); }
 @font-face { font-family: "Inter"; font-weight: 500; font-display: swap; src: url(/fonts/inter/inter-latin-500-normal.woff2) format("woff2"); }
 @font-face { font-family: "Inter"; font-weight: 600; font-display: swap; src: url(/fonts/inter/inter-latin-600-normal.woff2) format("woff2"); }
+@font-face { font-family: "Anek Malayalam"; font-weight: 400; font-display: swap; src: url(/fonts/anek-malayalam/anek-malayalam-malayalam-400-normal.woff2) format("woff2"); unicode-range: U+0D00-0D7F, U+200C-200D, U+25CC; }
+@font-face { font-family: "Anek Malayalam"; font-weight: 600; font-display: swap; src: url(/fonts/anek-malayalam/anek-malayalam-malayalam-600-normal.woff2) format("woff2"); unicode-range: U+0D00-0D7F, U+200C-200D, U+25CC; }
+@font-face { font-family: "Anek Malayalam"; font-weight: 700; font-display: swap; src: url(/fonts/anek-malayalam/anek-malayalam-malayalam-700-normal.woff2) format("woff2"); unicode-range: U+0D00-0D7F, U+200C-200D, U+25CC; }
+@font-face { font-family: "Anek Kannada"; font-weight: 400; font-display: swap; src: url(/fonts/anek-kannada/anek-kannada-kannada-400-normal.woff2) format("woff2"); unicode-range: U+0C80-0CFF, U+200C-200D, U+25CC; }
+@font-face { font-family: "Anek Kannada"; font-weight: 600; font-display: swap; src: url(/fonts/anek-kannada/anek-kannada-kannada-600-normal.woff2) format("woff2"); unicode-range: U+0C80-0CFF, U+200C-200D, U+25CC; }
+@font-face { font-family: "Anek Kannada"; font-weight: 700; font-display: swap; src: url(/fonts/anek-kannada/anek-kannada-kannada-700-normal.woff2) format("woff2"); unicode-range: U+0C80-0CFF, U+200C-200D, U+25CC; }
 
 /* ================= Themes =================
    Components only use the semantic tokens below (--bg, --surface, --text…).
@@ -54,8 +60,8 @@
   --ease: cubic-bezier(.22, 1, .36, 1);
   --ease-in-out: cubic-bezier(.76, 0, .24, 1);
   --gutter: clamp(16px, 5vw, 72px);
-  --display: "Outfit", system-ui, sans-serif;
-  --body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --display: "Outfit", "Anek Malayalam", "Anek Kannada", system-ui, sans-serif;
+  --body: "Inter", "Anek Malayalam", "Anek Kannada", system-ui, -apple-system, "Segoe UI", sans-serif;
 
   /* legacy names, still used by admin.css */
   --white: var(--surface);
@@ -418,7 +424,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   transition: transform 1s var(--ease), background .5s, border-color .5s;
 }
 body.is-ready .nav { transform: translate(-50%, 0); }
-.nav.is-hidden { transform: translate(-50%, -150%) !important; }
+.nav.is-scrolled { box-shadow: 0 16px 40px -18px rgba(var(--shadow), .55); }
 .nav__brand { display: inline-flex; align-items: center; gap: 10px; font: 700 21px/1 var(--display); letter-spacing: -.02em; }
 .nav__brand svg { width: 28px; height: 28px; transition: transform .8s var(--ease); }
 .nav__brand:hover svg { transform: rotate(-72deg); }
@@ -440,6 +446,32 @@ a:hover > .roll::after { transform: none; }
 .nav__toggle span:last-child { top: 25px; }
 .nav__toggle[aria-expanded="true"] span:first-child { transform: translateY(3.5px) rotate(45deg); }
 .nav__toggle[aria-expanded="true"] span:last-child { transform: translateY(-3.5px) rotate(-45deg); }
+
+/* language switch: always visible in the top bar */
+.lang { display: inline-flex; align-items: center; gap: 2px; padding: 3px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); flex: none; }
+.lang__opt {
+  position: relative; display: grid; place-items: center;
+  min-width: 38px; height: 36px; padding: 0 9px; border-radius: 999px;
+  font: 600 13px/1 var(--body); color: var(--muted);
+  transition: color .3s, background .3s, transform .3s var(--ease);
+}
+.lang__opt:hover { color: var(--text); transform: translateY(-1px); }
+.lang__opt[aria-current="true"] { background: var(--btn-bg); color: var(--btn-fg); }
+.lang__opt[lang="ml"], .lang__opt[lang="kn"] { font-size: 14px; font-weight: 700; }
+
+/* Malayalam and Kannada: taller letters, longer words, no letter-spacing */
+:lang(ml) body, :lang(kn) body { line-height: 1.75; }
+:lang(ml) .h2, :lang(kn) .h2 { font-size: clamp(30px, 5vw, 64px); line-height: 1.22; letter-spacing: 0; overflow-wrap: break-word; }
+:lang(ml) .h2 .w, :lang(kn) .h2 .w { padding: .14em 0 .22em; margin: -.14em 0 -.22em; }
+:lang(ml) .eyebrow, :lang(kn) .eyebrow { letter-spacing: .02em; font-size: 13px; }
+:lang(ml) .about__statement, :lang(kn) .about__statement { font-size: clamp(24px, 3.6vw, 48px); line-height: 1.4; letter-spacing: 0; }
+:lang(ml) .card h3, :lang(kn) .card h3, :lang(ml) .svc h3, :lang(kn) .svc h3, :lang(ml) .step h3, :lang(kn) .step h3 { line-height: 1.35; letter-spacing: 0; }
+:lang(ml) .nav__links a:not(.btn), :lang(kn) .nav__links a:not(.btn) { font-size: 13.5px; padding: 10px 10px; }
+:lang(ml) .roll, :lang(kn) .roll { height: 1.7em; line-height: 1.7; }
+:lang(ml) .price__label, :lang(kn) .price__label, :lang(ml) .footer__h, :lang(kn) .footer__h { letter-spacing: .02em; line-height: 1.4; }
+:lang(ml) .footer__cta h2, :lang(kn) .footer__cta h2 { line-height: 1.25; letter-spacing: 0; }
+:lang(ml) .faq__q, :lang(kn) .faq__q { line-height: 1.45; }
+:lang(ml) .marquee__track, :lang(kn) .marquee__track { line-height: 1.4; }
 
 /* theme picker */
 .theme { position: relative; }
@@ -474,7 +506,13 @@ a:hover > .roll::after { transform: none; }
 .swatch { flex: none; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border-strong); background: linear-gradient(90deg, var(--a) 50%, var(--b) 50%); position: relative; }
 .swatch::after { content: ""; position: absolute; inset: 11px; border-radius: 50%; background: var(--c); }
 
+@media (max-width: 1100px) and (min-width: 861px) {
+  .nav__links a:not(.btn) { padding: 10px 9px; font-size: 13px; }
+  .nav__brand span { display: none; }
+}
 @media (max-width: 860px) {
+  .nav { gap: 6px; }
+  .nav__brand { margin-right: auto; }
   .nav__toggle { display: block; }
   .nav__links {
     position: fixed; top: 70px; left: 0; right: 0;
@@ -973,6 +1011,35 @@ body.is-ready .hero__ctas { transition-delay: .65s; }
 @media (max-width: 760px) { .footer__cols { grid-template-columns: 1fr 1fr; } }
 
 @media (max-width: 600px) { .hide-sm { display: none; } }
+
+@media (max-width: 420px) {
+  .nav { padding-left: 12px; }
+  .nav__brand span { display: none; }
+  .lang__opt { min-width: 32px; height: 34px; padding: 0 6px; font-size: 12px; }
+  .theme__btn, .nav__toggle { width: 40px; height: 40px; }
+  .nav__toggle span { left: 11px; right: 11px; }
+  .nav__toggle span:first-child { top: 16px; } .nav__toggle span:last-child { top: 23px; }
+}
+
+/* long Malayalam/Kannada words on narrow phones */
+.calc > *, .calc__row > * { min-width: 0; }
+.calc__row { gap: 4px 10px; flex-wrap: wrap; }
+.locations__wrap > *, .locations__cards > * { min-width: 0; }
+.footer__cols > * { min-width: 0; overflow-wrap: anywhere; }
+.calc__total { flex-wrap: wrap; gap: 4px 10px; }
+@media (max-width: 420px) {
+  :lang(ml) .h2, :lang(kn) .h2 { font-size: clamp(22px, 7.6vw, 30px); }
+  :lang(ml) .h2 .w, :lang(kn) .h2 .w { max-width: 100%; }
+  :lang(ml) .h2 .w > span, :lang(kn) .h2 .w > span { overflow-wrap: anywhere; }
+  :lang(ml) .about__statement, :lang(kn) .about__statement { font-size: 22px; overflow-wrap: anywhere; }
+  :lang(ml) .card h3, :lang(kn) .card h3, :lang(ml) .svc h3, :lang(kn) .svc h3, :lang(ml) .step h3, :lang(kn) .step h3 { font-size: 19px; overflow-wrap: anywhere; }
+  :lang(ml) .footer__cta h2, :lang(kn) .footer__cta h2 { font-size: 26px; overflow-wrap: anywhere; }
+  :lang(ml) .compare__h, :lang(kn) .compare__h { font-size: 15px; }
+  .loc { padding: 22px 18px 22px 64px; }
+  .loc__pin { left: 18px; }
+  .loc h3 { font-size: 26px; overflow-wrap: anywhere; }
+  .calc__total b { font-size: 32px; }
+}
 
 /* very narrow screens: folded fold phones (~280px) */
 @media (max-width: 360px) {

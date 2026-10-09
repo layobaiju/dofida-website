@@ -55,7 +55,7 @@ test('home page renders with prices filled in and security headers', async () =>
   assert.match(html, /₹10,200/);
   assert.match(html, /₹199/);
   assert.match(html, /id="services"/);
-  assert.match(html, /src="\/brochure\?embed=1"/);
+  assert.match(html, /src="\/brochure\?embed=1&amp;lang=en"/);
   assert.doesNotMatch(html, /\{\{\w+\}\}/, 'no unreplaced template tokens');
   assert.match(res.headers.get('content-security-policy'), /script-src 'self'/);
   assert.equal(res.headers.get('x-powered-by'), null);
@@ -71,8 +71,52 @@ test('pages link versioned assets and are never served stale', async () => {
   assert.match(admin, /\/css\/admin\.css\?v=[0-9a-f]{10}/);
 });
 
+test('every page renders fully in English, Malayalam and Kannada', async () => {
+  const { dictionaries } = require('../src/i18n');
+  for (const lang of ['en', 'ml', 'kn']) {
+    for (const path of ['/', '/brochure']) {
+      const res = await fetch(`${base}${path}?lang=${lang}`);
+      assert.equal(res.status, 200);
+      const html = await res.text();
+      assert.doesNotMatch(html, /\{\{[\w.]+\}\}/, `${lang} ${path} has unfilled tokens`);
+      assert.match(html, new RegExp(`<html lang="${lang}">`));
+      assert.match(html, /₹20,400/, 'numbers stay the same in every language');
+      assert.match(res.headers.get('set-cookie') || '', new RegExp(`lang=${lang}`));
+    }
+    const home = await (await fetch(`${base}/?lang=${lang}`)).text();
+    assert.ok(home.includes(dictionaries[lang]['nav.services']));
+    assert.ok(home.includes(dictionaries[lang]['faq.q2']));
+  }
+});
+
+test('language choice is remembered with a cookie, English by default', async () => {
+  const plain = await (await fetch(base)).text();
+  assert.match(plain, /<html lang="en">/);
+  const remembered = await (await fetch(base, { headers: { cookie: 'lang=kn' } })).text();
+  assert.match(remembered, /<html lang="kn">/);
+  const bogus = await (await fetch(`${base}/?lang=xx`)).text();
+  assert.match(bogus, /<html lang="en">/);
+});
+
+test('enquiry errors come back in the visitor\'s language', async () => {
+  const res = await fetch(`${base}/api/enquiries`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: '', phone: '1', lang: 'ml' }) });
+  const body = await res.json();
+  assert.equal(body.fields.name, require('../src/i18n/ml')['js.errName']);
+});
+
+test('PDF brochure is generated in each language', async () => {
+  for (const lang of ['ml', 'kn']) {
+    const res = await fetch(`${base}/api/brochure?lang=${lang}`);
+    assert.equal(res.status, 200);
+    assert.match(res.headers.get('content-disposition'), new RegExp(`Brochure-${lang}\\.pdf`));
+    const buf = Buffer.from(await res.arrayBuffer());
+    assert.equal(buf.subarray(0, 5).toString(), '%PDF-');
+    assert.match(buf.toString('latin1'), /Anek/, 'uses the Malayalam/Kannada font');
+  }
+});
+
 test('static assets and fonts are served', async () => {
-  for (const p of ['/css/style.css', '/js/main.js', '/img/logo-mark.svg', '/fonts/outfit/outfit-latin-700-normal.woff2', '/admin']) {
+  for (const p of ['/css/style.css', '/js/main.js', '/img/logo-mark.svg', '/fonts/outfit/outfit-latin-700-normal.woff2', '/fonts/anek-malayalam/anek-malayalam-malayalam-700-normal.woff2', '/fonts/anek-kannada/anek-kannada-kannada-700-normal.woff2', '/admin']) {
     const res = await fetch(base + p);
     assert.equal(res.status, 200, p);
   }
@@ -94,6 +138,8 @@ test('quote endpoint applies the multi-nursery discount', async () => {
 });
 
 test('brochure downloads as a multi-page PDF and is counted', async () => {
+  await store.flush();
+  const before = store.stats().downloads;
   const res = await fetch(`${base}/api/brochure`);
   assert.equal(res.status, 200);
   assert.equal(res.headers.get('content-type'), 'application/pdf');
@@ -102,7 +148,7 @@ test('brochure downloads as a multi-page PDF and is counted', async () => {
   assert.equal(buf.subarray(0, 5).toString(), '%PDF-');
   assert.ok((buf.toString('latin1').match(/\/Type \/Page\b/g) || []).length >= 8);
   await store.flush();
-  assert.equal(store.stats().downloads, 1);
+  assert.equal(store.stats().downloads, before + 1);
 });
 
 test('enquiry validation rejects bad input', async () => {

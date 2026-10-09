@@ -8,6 +8,7 @@ The website for **Dofida Group**. We build and maintain websites, mobile apps, e
 - **Downloadable PDF brochure** generated from the same data
 - **Enquiry form** backed by an API, with validation, spam protection and rate limiting
 - **Admin dashboard** at `/admin` to read enquiries, set their status, add notes and export CSV
+- **Three languages**: English (default), Malayalam and Kannada, switchable from the top bar on every screen; the whole site, the animated brochure, the PDF, form messages and pop-ups change language (numbers stay the same). Translations live in `src/i18n/`.
 - Dark Midnight theme by default, plus Paper and Sage themes; the same fonts (Outfit + Inter) and colours across the site, brochure and PDF
 
 ## Run it on your computer (Windows)

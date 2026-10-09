@@ -2,9 +2,18 @@
 // Content comes from config.js so the PDF always matches the website.
 
 const PDFDocument = require('pdfkit');
+const path = require('path');
 const { company, pricing, product, formatINR } = require('./config');
+const i18n = require('./i18n');
 
 const font = (name) => require.resolve(`@fontsource/${name}`);
+// Malayalam and Kannada use Anek (TTF files in assets/fonts, converted from @fontsource;
+// the PDF library can't shape these scripts from the web font files).
+const ANEK = (name, w) => path.join(__dirname, '..', 'assets', 'fonts', `anek-${name}-${w}.ttf`);
+const INDIC_FONTS = {
+  ml: { display: ANEK('malayalam', 700), displayBold: ANEK('malayalam', 700), body: ANEK('malayalam', 400), bodySemi: ANEK('malayalam', 700) },
+  kn: { display: ANEK('kannada', 700), displayBold: ANEK('kannada', 700), body: ANEK('kannada', 400), bodySemi: ANEK('kannada', 700) },
+};
 const FONTS = {
   display: font('outfit/files/outfit-latin-700-normal.woff'),
   displayBold: font('outfit/files/outfit-latin-800-normal.woff'),
@@ -32,6 +41,10 @@ const C = {
   leaf: '#3F8F6B',
   white: '#FFFFFF',
 };
+
+// Set by buildBrochure() for the language being drawn.
+let T = (key) => key;
+let SPACING = (n) => n; // letter-spacing; Indic scripts must not be spaced apart
 
 const W = 960;
 const H = 540;
@@ -62,6 +75,16 @@ function money(doc, amount, x, y, size, color, { align = 'left' } = {}) {
   return rupeeW + digitsW;
 }
 
+// Text that may contain "₹": the rupee sign is drawn with the font that has it.
+function mixed(doc, str, x, y, size, color) {
+  const parts = str.split('₹');
+  doc.fillColor(color).fontSize(size).font('bodySemi').text(parts[0], x, y, { continued: parts.length > 1, lineBreak: false });
+  parts.slice(1).forEach((part, i) => {
+    doc.font('rupee').text('₹', { continued: true, lineBreak: false });
+    doc.font('bodySemi').text(part, { continued: i < parts.length - 2, lineBreak: false });
+  });
+}
+
 function card(doc, x, y, w, h, { fill = C.card, stroke = C.line, r = 16 } = {}) {
   doc.roundedRect(x, y, w, h, r).fillAndStroke(fill, stroke);
 }
@@ -76,13 +99,13 @@ function frame(doc, n, total) {
   doc.circle(W - 40, H + 60, 260).fillOpacity(0.12).fill(C.blue).fillOpacity(1);
   star(doc, M, H - 40, 18);
   doc.font('bodySemi').fontSize(9).fillColor(C.muted)
-    .text(`${company.legalName.toUpperCase()}  ·  ${product.name.toUpperCase()}`, M + 26, H - 35, { characterSpacing: 1.5, lineBreak: false });
+    .text(T('pdf.footer'), M + 26, H - 35, { characterSpacing: SPACING(1.5), lineBreak: false });
   doc.text(`${String(n).padStart(2, '0')} / ${String(total).padStart(2, '0')}`, W - M - 60, H - 35, { width: 60, align: 'right', lineBreak: false });
 }
 
-function heading(doc, eyebrow, title) {
-  doc.font('bodySemi').fontSize(10).fillColor(C.blueL).text(eyebrow.toUpperCase(), M, M, { characterSpacing: 2.5 });
-  doc.font('display').fontSize(34).fillColor(C.text).text(title, M, M + 20, { width: W - 2 * M });
+function heading(doc, eyebrow, title, width = W - 2 * M) {
+  doc.font('bodySemi').fontSize(10).fillColor(C.blueL).text(eyebrow.toUpperCase(), M, M, { characterSpacing: SPACING(2.5) });
+  doc.font('display').fontSize(34).fillColor(C.text).text(title, M, M + 20, { width });
 }
 
 function check(doc, x, y) {
@@ -100,17 +123,17 @@ const slides = [
     doc.font('displayBold').fontSize(40).fillColor(C.text).text(company.name, W / 2 - 150, H / 2 + 40, { width: 300, align: 'center' });
     doc.font('bodySemi').fontSize(10).fillColor(C.muted).text('GROUP', W / 2 - 150, H / 2 + 88, { width: 300, align: 'center', characterSpacing: 6 });
     doc.font('display').fontSize(26).fillColor(C.white).text(product.name, M, H - M - 60);
-    doc.font('body').fontSize(12).fillColor('#C9CFE2').text('Billing software + printer for plant nurseries', M, H - M - 26, { width: W / 2 - 2 * M });
-    doc.font('bodySemi').fontSize(11).fillColor(C.ink).text(`${product.platforms.join('  ·  ')}  ·  All of Kerala & Karnataka`, W / 2 + M, H - M - 20, { width: W / 2 - 2 * M, align: 'right' });
+    doc.font('body').fontSize(12).fillColor('#C9CFE2').text(T('pdf.coverTag'), M, H - M - 26, { width: W / 2 - 2 * M });
+    doc.font('bodySemi').fontSize(11).fillColor(C.ink).text(T('pdf.coverChip'), W / 2 + M, H - M - 20, { width: W / 2 - 2 * M, align: 'right' });
   },
   // 2. What it is
   (doc, n, t) => {
     frame(doc, n, t);
-    heading(doc, 'What is Plant Bill', 'Billing made for plant nurseries.');
-    doc.font('body').fontSize(15).fillColor(C.muted).text(product.summary, M, M + 90, { width: 470, lineGap: 5 });
-    const items = [`Works on ${product.platforms.join(' and ')}`, 'Billing printer included', `Serving ${company.serviceArea}`];
+    heading(doc, T('pdf.whatEyebrow'), T('pdf.whatH'), 540);
+    doc.font('body').fontSize(15).fillColor(C.muted).text(T('pdf.whatP'), M, M + 130, { width: 470, lineGap: 5 });
+    const items = [T('pdf.what1'), T('pdf.what2'), T('pdf.what3')];
     items.forEach((it, i) => {
-      const y = M + 230 + i * 40;
+      const y = M + 260 + i * 40;
       doc.circle(M + 7, y + 7, 6).fill(C.blue);
       doc.font('bodySemi').fontSize(13).fillColor(C.text).text(it, M + 26, y);
     });
@@ -119,19 +142,19 @@ const slides = [
     doc.roundedRect(px, py, 190, 380, 28).fill(C.deep);
     doc.roundedRect(px + 10, py + 14, 170, 352, 20).fillAndStroke(C.card, C.line);
     doc.font('display').fontSize(14).fillColor(C.text).text(product.name, px + 26, py + 34);
-    ['Areca Palm  x2', 'Money Plant  x3', 'Hibiscus  x1', 'Rose (Grafted)  x4'].forEach((row, i) => {
+    T('pdf.plants').split('|').forEach((row, i) => {
       card(doc, px + 24, py + 70 + i * 46, 142, 36, { fill: i === 1 ? C.tint : C.card2, r: 8 });
       doc.font('body').fontSize(10).fillColor(C.text).text(row, px + 34, py + 82 + i * 46);
     });
     doc.roundedRect(px + 24, py + 300, 142, 40, 10).fill(C.blue);
-    doc.font('bodySemi').fontSize(12).fillColor(C.white).text('Print bill', px + 24, py + 313, { width: 142, align: 'center' });
+    doc.font('bodySemi').fontSize(12).fillColor(C.white).text(T('pdf.printBill'), px + 24, py + 313, { width: 142, align: 'center' });
   },
   // 3. Features
   (doc, n, t) => {
     frame(doc, n, t);
-    heading(doc, 'Features', 'Everything a nursery counter needs.');
+    heading(doc, T('pdf.featEyebrow'), T('pdf.featH'));
     const cw = (W - 2 * M - 2 * 20) / 3;
-    product.features.forEach((f, i) => {
+    [1, 2, 3, 4, 5, 6].map((k) => ({ title: T(`pdf.f${k}h`), text: T(`pdf.f${k}p`) })).forEach((f, i) => {
       const x = M + (i % 3) * (cw + 20);
       const y = M + 90 + Math.floor(i / 3) * 170;
       card(doc, x, y, cw, 150);
@@ -144,10 +167,10 @@ const slides = [
   // 4. How it works
   (doc, n, t) => {
     frame(doc, n, t);
-    heading(doc, 'How it works', 'From enquiry to your first printed bill.');
+    heading(doc, T('pdf.howEyebrow'), T('pdf.howH'));
     const cw = (W - 2 * M) / 4;
     doc.moveTo(M + 22, M + 160).lineTo(W - M - cw + 22, M + 160).lineWidth(2).dash(4, { space: 5 }).strokeColor(C.blue).stroke().undash();
-    product.steps.forEach((st, i) => {
+    [1, 2, 3, 4].map((k) => ({ title: T(`pdf.s${k}h`), text: T(`pdf.s${k}p`) })).forEach((st, i) => {
       const x = M + i * cw;
       doc.circle(x + 22, M + 160, 22).fill(i === 3 ? C.blue : C.paper);
       doc.font('displayBold').fontSize(16).fillColor(i === 3 ? C.white : C.ink).text(String(i + 1), x, M + 150, { width: 44, align: 'center' });
@@ -158,15 +181,15 @@ const slides = [
   // 5. Pricing
   (doc, n, t) => {
     frame(doc, n, t);
-    heading(doc, 'Pricing', 'One simple price. Printer included.');
+    heading(doc, T('pdf.priceEyebrow'), T('pdf.priceH'));
     const cards = [
-      { label: 'First nursery', amount: pricing.firstNursery, note: 'Software + printer', main: true },
-      { label: 'Each extra nursery', amount: pricing.additionalNursery, note: 'Same owner · printer included' },
+      { label: T('pdf.first'), amount: pricing.firstNursery, note: T('pdf.firstS'), main: true },
+      { label: T('pdf.extra'), amount: pricing.additionalNursery, note: T('pdf.extraS') },
     ];
     cards.forEach((c, i) => {
       const x = M + i * 290, y = M + 95, w = 270, h = 200;
       card(doc, x, y, w, h, { fill: c.main ? C.deep : C.card, stroke: c.main ? C.blue : C.line, r: 18 });
-      doc.font('bodySemi').fontSize(11).fillColor(C.muted).text(c.label.toUpperCase(), x + 24, y + 24, { characterSpacing: 1.5 });
+      doc.font('bodySemi').fontSize(11).fillColor(C.muted).text(c.label.toUpperCase(), x + 24, y + 24, { characterSpacing: SPACING(1.5) });
       money(doc, c.amount, x + 24, y + 56, 44, C.text);
       doc.font('body').fontSize(11).fillColor(C.muted).text(c.note, x + 24, y + 130, { width: w - 48 });
       if (!c.main) {
@@ -176,58 +199,46 @@ const slides = [
     });
     // Example totals
     const tx = M + 600, ty = M + 95;
-    doc.font('bodySemi').fontSize(11).fillColor(C.muted).text('EXAMPLE TOTALS · ONE TIME', tx, ty, { characterSpacing: 1.5 });
+    doc.font('bodySemi').fontSize(11).fillColor(C.muted).text(T('pdf.examples'), tx, ty, { characterSpacing: SPACING(1.5) });
     [1, 2, 3, 5].forEach((count, i) => {
       const y = ty + 30 + i * 42;
       const total = pricing.firstNursery + (count - 1) * pricing.additionalNursery;
       doc.moveTo(tx, y + 32).lineTo(W - M, y + 32).lineWidth(1).strokeColor(C.line).stroke();
-      doc.font('body').fontSize(13).fillColor(C.text).text(`${count} nurser${count === 1 ? 'y' : 'ies'}`, tx, y + 8);
+      doc.font('body').fontSize(13).fillColor(C.text).text(i18n.format(T(count === 1 ? 'pdf.nursery' : 'pdf.nurseries'), { n: count }), tx, y + 8);
       money(doc, total, W - M, y + 6, 15, C.text, { align: 'right' });
     });
     // Monthly subscription band
     const by = M + 318;
     card(doc, M, by, W - 2 * M, 64, { fill: C.tint, stroke: C.blue });
-    doc.font('bodySemi').fontSize(10).fillColor(C.blueL).text('MONTHLY SUBSCRIPTION', M + 24, by + 14, { characterSpacing: 1.5 });
+    doc.font('bodySemi').fontSize(10).fillColor(C.blueL).text(T('pdf.monthly'), M + 24, by + 14, { characterSpacing: SPACING(1.5) });
     const mw = money(doc, pricing.monthly, M + 24, by + 30, 22, C.white);
-    doc.font('display').fontSize(14).fillColor(C.muted).text('/ month', M + 24 + mw + 8, by + 36, { lineBreak: false });
-    doc.font('bodySemi').fontSize(13).fillColor(C.text).text('One flat fee for all your nurseries, no matter how many you have.', M + 260, by + 25, { width: W - 2 * M - 290 });
-    doc.font('body').fontSize(10).fillColor(C.muted).text('Additional-nursery pricing applies to nurseries owned by the same owner.', M, by + 76, { width: 540 });
+    doc.font('display').fontSize(14).fillColor(C.muted).text(T('pdf.perMonth'), M + 24 + mw + 8, by + 36, { lineBreak: false });
+    doc.font('bodySemi').fontSize(13).fillColor(C.text).text(T('pdf.monthlyLine'), M + 260, by + 25, { width: W - 2 * M - 290 });
+    doc.font('body').fontSize(10).fillColor(C.muted).text(T('pdf.sameOwner'), M, by + 76, { width: 540 });
   },
   // 6. What's included
   (doc, n, t) => {
     frame(doc, n, t);
-    heading(doc, "What's in the box", 'Everything you need on day one.');
-    [...pricing.includes, `₹${formatINR(pricing.monthly)}/month covers all your nurseries`].forEach((item, i) => {
+    heading(doc, T('pdf.boxEyebrow'), T('pdf.boxH'));
+    [1, 2, 3, 4, 5].map((k) => T(`pdf.box${k}`)).forEach((item, i) => {
       const y = M + 90 + i * 58;
       card(doc, M, y, 520, 46, { r: 14 });
       check(doc, M + 26, y + 23);
-      if (item.startsWith('₹')) {
-        doc.font('rupee').fontSize(13).fillColor(C.text).text('₹', M + 50, y + 16, { continued: true });
-        doc.font('bodySemi').text(item.slice(1));
-      } else {
-        doc.font('bodySemi').fontSize(13).fillColor(C.text).text(item, M + 50, y + 16);
-      }
+      mixed(doc, item, M + 50, y + 16, 13, C.text);
     });
     star(doc, 680, 140, 220);
   },
   // 7. Services
   (doc, n, t) => {
     frame(doc, n, t);
-    heading(doc, 'Beyond Plant Bill', 'We build for every kind of business.');
-    const services = [
-      ['Plant Bill', 'Billing software + printer for plant nurseries'],
-      ['Websites', 'Designed and built for any company'],
-      ['Website maintenance', 'Updates, fixes and keeping your site running'],
-      ['Mobile apps', 'Android and iOS apps'],
-      ['E-commerce', 'Online stores that take orders'],
-      ['Custom software', 'Billing, business tools and much more'],
-    ];
+    heading(doc, T('pdf.svcEyebrow'), T('pdf.svcH'));
+    const services = [1, 2, 3, 4, 5, 6].map((k) => [T(`pdf.sv${k}`), T(`pdf.sv${k}p`)]);
     const cw = (W - 2 * M - 2 * 20) / 3;
     services.forEach(([title, text], i) => {
       const x = M + (i % 3) * (cw + 20);
       const y = M + 95 + Math.floor(i / 3) * 150;
       card(doc, x, y, cw, 130, { fill: i === 0 ? C.tint : C.card, stroke: i === 0 ? C.blue : C.line });
-      doc.font('bodySemi').fontSize(10).fillColor(C.blueL).text(String(i + 1).padStart(2, '0'), x + 20, y + 20, { characterSpacing: 1.5 });
+      doc.font('bodySemi').fontSize(10).fillColor(C.blueL).text(String(i + 1).padStart(2, '0'), x + 20, y + 20, { characterSpacing: SPACING(1.5) });
       doc.font('display').fontSize(18).fillColor(C.text).text(title, x + 20, y + 44, { width: cw - 40 });
       doc.font('body').fontSize(11).fillColor(C.muted).text(text, x + 20, y + 74, { width: cw - 40, lineGap: 2 });
     });
@@ -235,26 +246,26 @@ const slides = [
   // 8. Contact
   (doc, n, t) => {
     frame(doc, n, t);
-    heading(doc, 'Talk to us', 'Ready to bill smarter?');
-    doc.font('body').fontSize(14).fillColor(C.muted).text(`We serve businesses and nurseries across ${company.serviceArea}. Send us an enquiry on our website and we will get back to you.`, M, M + 80, { width: 500, lineGap: 4 });
-    company.locations.forEach((loc, i) => {
+    heading(doc, T('pdf.talkEyebrow'), T('pdf.talkH'));
+    doc.font('body').fontSize(14).fillColor(C.muted).text(T('pdf.talkP'), M, M + 80, { width: 500, lineGap: 4 });
+    [{ city: T('pdf.calicut'), region: T('pdf.kerala') }, { city: T('pdf.hunsur'), region: T('pdf.karnataka') }].forEach((loc, i) => {
       const x = M + i * 250, y = M + 180;
       card(doc, x, y, 230, 110);
-      doc.font('bodySemi').fontSize(10).fillColor(C.blueL).text(loc.note.toUpperCase(), x + 20, y + 20, { characterSpacing: 1.5 });
+      doc.font('bodySemi').fontSize(10).fillColor(C.blueL).text(T('pdf.office'), x + 20, y + 20, { characterSpacing: SPACING(1.5) });
       doc.font('display').fontSize(24).fillColor(C.text).text(loc.city, x + 20, y + 40);
       doc.font('body').fontSize(12).fillColor(C.muted).text(loc.region, x + 20, y + 74);
     });
     const lines = [
-      company.contact.phone && `Phone: ${company.contact.phone}`,
-      company.contact.whatsapp && `WhatsApp: ${company.contact.whatsapp}`,
-      company.contact.email && `Email: ${company.contact.email}`,
+      company.contact.phone && `${T('pdf.phone')}: ${company.contact.phone}`,
+      company.contact.whatsapp && `${T('pdf.whatsapp')}: ${company.contact.whatsapp}`,
+      company.contact.email && `${T('pdf.email')}: ${company.contact.email}`,
     ].filter(Boolean);
     if (lines.length) doc.font('bodySemi').fontSize(12).fillColor(C.text).text(lines.join('     '), M, M + 320);
     star(doc, 700, 120, 190);
   },
 ];
 
-function buildBrochure() {
+function buildBrochure(lang = i18n.DEFAULT_LANG) {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({
       size: [W, H],
@@ -262,7 +273,10 @@ function buildBrochure() {
       autoFirstPage: false,
       info: { Title: `${product.name} by ${company.legalName}`, Author: company.legalName, Subject: 'Plant nursery billing software' },
     });
-    for (const [name, file] of Object.entries(FONTS)) doc.registerFont(name, file);
+    const vars = { PRICE_FIRST: formatINR(pricing.firstNursery), PRICE_ADDITIONAL: formatINR(pricing.additionalNursery), MONTHLY: formatINR(pricing.monthly), DISCOUNT: String(pricing.additionalDiscountPercent) };
+    T = (key) => i18n.t(lang, key).replace(/\{\{(\w+)\}\}/g, (m, k) => vars[k] ?? m).replace(/&amp;/g, '&');
+    SPACING = (n) => (lang === 'en' ? n : 0);
+    for (const [name, file] of Object.entries({ ...FONTS, ...(INDIC_FONTS[lang] || {}) })) doc.registerFont(name, file);
     const chunks = [];
     doc.on('data', (c) => chunks.push(c));
     doc.on('end', () => resolve(Buffer.concat(chunks)));

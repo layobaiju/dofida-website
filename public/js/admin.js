@@ -67,6 +67,7 @@
       el('span', {}, 'Nurseries: ', el('b', { textContent: String(e.nurseries) })),
       e.estimate ? el('span', {}, 'Estimate: ', el('b', { textContent: `₹${Number(e.estimate).toLocaleString('en-IN')}` })) : null,
       el('span', {}, 'Interest: ', el('b', { textContent: e.interest })),
+      e.lang ? el('span', {}, 'Language: ', el('b', { textContent: { en: 'English', ml: 'Malayalam', kn: 'Kannada' }[e.lang] || e.lang })) : null,
     );
 
     return el('article', { className: 'enq', dataset: { status: e.status } },

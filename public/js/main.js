@@ -13,6 +13,21 @@
     set(k, v) { try { sessionStorage.setItem(k, v); } catch { /* private mode */ } },
   };
 
+  // ---------------- Translations ----------------
+  // The server puts the strings this script needs, in the page's language, into #i18n.
+  let STR = {};
+  try { STR = JSON.parse($('#i18n')?.textContent || '{}'); } catch { /* fall back to keys */ }
+  const tr = (key, vals = {}) => (STR[key] || key).replace(/\{(\w+)\}/g, (m, k) => (k in vals ? vals[k] : m));
+  const LANG = document.documentElement.lang || 'en';
+
+  // Switching language reloads the page in that language; keep the reader where they were.
+  const langJump = Number(store.get('dofida-lang-y'));
+  try { sessionStorage.removeItem('dofida-lang-y'); } catch { /* ignore */ }
+  $$('.lang__opt').forEach((a) => {
+    a.setAttribute('aria-current', String(a.dataset.lang === LANG));
+    a.addEventListener('click', () => store.set('dofida-lang-y', String(Math.round(scrollY))));
+  });
+
   // ---------------- Always open at the top ----------------
   // Browsers restore the last scroll position (and jump to any #section in the
   // address) on reload. The site always starts at the top with the intro.
@@ -20,6 +35,11 @@
   if (location.hash) history.replaceState(null, '', location.pathname + location.search);
   scrollTo(0, 0);
   addEventListener('pageshow', (e) => { if (e.persisted) scrollTo(0, 0); });
+  if (langJump) {
+    // came from the language switch: no intro, back to the same spot
+    store.set('dofida-intro', '1');
+    addEventListener('load', () => scrollTo({ top: langJump, behavior: 'instant' }));
+  }
 
   // In-page links scroll smoothly without adding #section to the address.
   document.addEventListener('click', (e) => {
@@ -46,7 +66,7 @@
     setTimeout(() => intro.classList.add('is-gone'), 1300);
   }
   const seen = store.get('dofida-intro');
-  const introDelay = reduceMotion ? 0 : seen ? 1200 : 2700;
+  const introDelay = reduceMotion || langJump ? 0 : seen ? 1200 : 2700;
   setTimeout(endIntro, introDelay);
   $('.intro__skip').addEventListener('click', endIntro);
   intro.addEventListener('click', endIntro);
@@ -101,7 +121,7 @@
   const words = $('[data-words]');
   let wordEls = [];
   if (words) {
-    const accent = new Set(['websites,', 'apps,', 'Plant', 'Bill', 'faster,', 'instantly']);
+    const accent = new Set((words.dataset.accent || '').split('|'));
     words.innerHTML = words.textContent.trim().split(/\s+/)
       .map((w) => `<span class="w${accent.has(w) ? ' is-accent' : ''}">${w}</span>`).join(' ');
     wordEls = $$('.w', words);
@@ -118,8 +138,8 @@
     const max = document.documentElement.scrollHeight - innerHeight;
     progress.style.transform = `scaleX(${max > 0 ? y / max : 0})`;
 
-    if (y > 200 && y > lastY + 4 && !links.classList.contains('is-open')) nav.classList.add('is-hidden');
-    else if (y < lastY - 4 || y < 200) nav.classList.remove('is-hidden');
+    // The top bar stays visible so the language and theme switches are always one tap away.
+    nav.classList.toggle('is-scrolled', y > 40);
     lastY = y;
 
     if (!reduceMotion && y < innerHeight * 1.2) {
@@ -307,7 +327,7 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toastEl.classList.remove('is-on'), 3200);
   }
-  $$('a[href^="/api/brochure"][download]').forEach((a) => a.addEventListener('click', () => toast('Your Plant Bill brochure is downloading')));
+  $$('a[href^="/api/brochure"][download]').forEach((a) => a.addEventListener('click', () => toast(tr('js.toastPdf'))));
 
   // ---------------- Back to top ----------------
   $('#toTop')?.addEventListener('click', () => scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }));
@@ -317,7 +337,7 @@
   if (themeWrap) {
     const btn = $('#themeBtn');
     const options = $$('[data-theme-value]', themeWrap);
-    const names = { paper: 'Paper', midnight: 'Midnight', sage: 'Sage' };
+    const names = { paper: tr('theme.paper'), midnight: tr('theme.midnight'), sage: tr('theme.sage') };
     const current = () => document.documentElement.getAttribute('data-theme') || 'paper';
     const sync = () => {
       options.forEach((o) => o.setAttribute('aria-checked', String(o.dataset.themeValue === current())));
@@ -351,7 +371,7 @@
       const theme = o.dataset.themeValue;
       setOpen(false);
       if (theme === current()) return;
-      const done = () => { sync(); toast(`${names[theme]} theme on`); };
+      const done = () => { sync(); toast(tr('js.toastTheme', { name: names[theme] })); };
       // Circular reveal from the click point, where the browser supports it.
       if (!document.startViewTransition || reduceMotion) { apply(theme); done(); return; }
       const r = btn.getBoundingClientRect();
@@ -407,10 +427,10 @@
   const demo = $('#demo');
   if (demo) {
     const items = [
-      ['Areca Palm', 2, 350],
-      ['Money Plant', 3, 120],
-      ['Hibiscus', 1, 180],
-      ['Rose (Grafted)', 4, 90],
+      [tr('plant.areca'), 2, 350],
+      [tr('plant.money'), 3, 120],
+      [tr('plant.hibiscus'), 1, 180],
+      [tr('plant.rose'), 4, 90],
     ];
     const list = $('#appItems');
     const total = $('#appTotal');
@@ -547,6 +567,7 @@
     const status = $('#formStatus');
     const done = $('#formDone');
     const label = $('.btn__label', form);
+    const sendLabel = label.textContent;
 
     const setError = (name, msg) => {
       const field = form.elements[name]?.closest('.field');
@@ -558,10 +579,10 @@
 
     function validate(data) {
       const errors = {};
-      if ((data.name || '').trim().length < 2) errors.name = 'Please tell us your name.';
+      if ((data.name || '').trim().length < 2) errors.name = tr('js.errName');
       const digits = (data.phone || '').replace(/\D/g, '');
-      if (!/^[+\d][\d\s-]{6,18}$/.test((data.phone || '').trim()) || digits.length < 7) errors.phone = 'Please enter a valid phone number.';
-      if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) errors.email = 'That email address does not look right.';
+      if (!/^[+\d][\d\s-]{6,18}$/.test((data.phone || '').trim()) || digits.length < 7) errors.phone = tr('js.errPhone');
+      if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) errors.email = tr('js.errEmail');
       return errors;
     }
 
@@ -579,28 +600,28 @@
         return;
       }
       form.classList.add('is-sending');
-      label.textContent = 'Sending…';
+      label.textContent = tr('js.sending');
       try {
         const res = await fetch('/api/enquiries', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
+          body: JSON.stringify({ ...data, lang: LANG }),
         });
         const body = await res.json().catch(() => ({}));
         if (!res.ok) {
           if (body.fields) Object.entries(body.fields).forEach(([k, v]) => setError(k, v));
-          throw new Error(body.error || 'Could not send your enquiry.');
+          throw new Error(body.error || tr('js.failed'));
         }
         done.hidden = false;
-        toast('Enquiry sent. We will be in touch soon');
+        toast(tr('js.toastSent'));
         form.reset();
         updateEstimate();
         syncEstimate();
       } catch (err) {
-        status.textContent = `${err.message} Please try again.`;
+        status.textContent = `${err.message} ${tr('js.tryAgain')}`;
       } finally {
         form.classList.remove('is-sending');
-        label.textContent = 'Send enquiry';
+        label.textContent = sendLabel;
       }
     });
 

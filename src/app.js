@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const express = require('express');
 const { company, pricing, product, formatINR } = require('./config');
 const { buildBrochure } = require('./brochure');
+const i18n = require('./i18n');
 
 const PUBLIC = path.join(__dirname, '..', 'public');
 const STATUSES = ['new', 'contacted', 'demo', 'won', 'closed'];
@@ -35,9 +36,14 @@ function renderPage(file) {
   return versionAssets(fs.readFileSync(path.join(PUBLIC, file), 'utf8'));
 }
 
-// Fills {{TOKENS}} from config, so prices and contact details always match the PDF.
-function renderTemplate(file) {
-  const tpl = renderPage(file);
+// Fills {{t.key}} with the chosen language's text and {{TOKENS}} from config,
+// so prices and contact details always match the PDF.
+function renderTemplate(file, lang = i18n.DEFAULT_LANG) {
+  const clientKeys = file === 'brochure.html' ? ['bro.', 'lang.'] : ['js.', 'theme.', 'plant.', 'lang.'];
+  const json = JSON.stringify(i18n.clientStrings(lang, clientKeys)).replace(/</g, '\\u003c');
+  const tpl = renderPage(file)
+    .replace(/\{\{t\.([\w.]+)\}\}/g, (m, key) => i18n.t(lang, key))
+    .replace('{{I18N_JSON}}', json);
   const contactLines = [
     company.contact.phone && `<a href="tel:${escapeHtml(company.contact.phone.replace(/\s/g, ''))}">${escapeHtml(company.contact.phone)}</a>`,
     company.contact.whatsapp && `<a href="https://wa.me/${escapeHtml(company.contact.whatsapp.replace(/\D/g, ''))}" target="_blank" rel="noopener">WhatsApp ${escapeHtml(company.contact.whatsapp)}</a>`,
@@ -53,6 +59,7 @@ function renderTemplate(file) {
     MONTHLY_RAW: String(pricing.monthly),
     CONTACT_LINES: contactLines.join(''),
     YEAR: String(new Date().getFullYear()),
+    LANG: lang,
   };
   return tpl.replace(/\{\{(\w+)\}\}/g, (m, key) => (key in vars ? vars[key] : m));
 }
@@ -73,15 +80,27 @@ function rateLimit({ windowMs, max }) {
     }
     if (++entry.count > max) {
       res.set('Retry-After', String(Math.ceil((entry.reset - now) / 1000)));
-      return res.status(429).json({ error: 'Too many requests. Please try again in a few minutes.' });
+      return res.status(429).json({ error: i18n.t(pickLang(req, res), 'err.tooMany') });
     }
     next();
   };
 }
 
+// Language for this request: ?lang= (remembered in a cookie), then the cookie, then English.
+function pickLang(req, res) {
+  const q = String(req.query.lang || '');
+  if (i18n.LANGS.includes(q)) {
+    res.cookie?.('lang', q, { maxAge: 365 * 24 * 3600 * 1000, sameSite: 'lax', httpOnly: false });
+    return q;
+  }
+  const m = /(?:^|;\s*)lang=(\w+)/.exec(req.get('cookie') || '');
+  return m && i18n.LANGS.includes(m[1]) ? m[1] : i18n.DEFAULT_LANG;
+}
+
 const str = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 
-function validateEnquiry(body) {
+function validateEnquiry(body, lang = i18n.DEFAULT_LANG) {
+  const tr = (k) => i18n.t(lang, k);
   const errors = {};
   const e = {
     name: str(body.name, 80),
@@ -93,10 +112,10 @@ function validateEnquiry(body) {
     interest: str(body.interest, 40),
     message: str(body.message, 2000),
   };
-  if (e.name.length < 2) errors.name = 'Please tell us your name.';
-  if (!/^[+\d][\d\s-]{6,18}$/.test(e.phone) || e.phone.replace(/\D/g, '').length < 7) errors.phone = 'Please enter a valid phone number.';
-  if (e.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.email)) errors.email = 'That email address does not look right.';
-  if (e.nurseries < 1 || e.nurseries > 500) errors.nurseries = 'Number of nurseries should be between 1 and 500.';
+  if (e.name.length < 2) errors.name = tr('js.errName');
+  if (!/^[+\d][\d\s-]{6,18}$/.test(e.phone) || e.phone.replace(/\D/g, '').length < 7) errors.phone = tr('js.errPhone');
+  if (e.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.email)) errors.email = tr('js.errEmail');
+  if (e.nurseries < 1 || e.nurseries > 500) errors.nurseries = tr('err.nurseries');
   if (!INTERESTS.includes(e.interest)) e.interest = 'plant-bill';
   return { enquiry: e, errors };
 }
@@ -142,16 +161,21 @@ function createApp({ store, adminToken = process.env.ADMIN_TOKEN, notify } = {})
   // HTML is always revalidated; the assets it links to carry a content hash.
   const pages = {};
   const page = (name, render) => (req, res) => {
-    if (!pages[name] || DEV) pages[name] = render();
-    res.set('Cache-Control', 'no-cache').type('html').send(pages[name]);
+    const lang = pickLang(req, res);
+    const key = `${name}:${lang}`;
+    if (!pages[key] || DEV) pages[key] = render(lang);
+    res.set({ 'Cache-Control': 'no-cache', 'Content-Language': lang, Vary: 'Cookie' }).type('html').send(pages[key]);
   };
-  const sendIndex = page('index', () => renderTemplate('index.html'));
+  const sendIndex = page('index', (lang) => renderTemplate('index.html', lang));
   app.get(['/', '/index.html'], sendIndex);
 
   app.use('/fonts/outfit', express.static(path.join(path.dirname(require.resolve('@fontsource/outfit/package.json')), 'files'), { maxAge: '30d', immutable: true }));
+  for (const fam of ['anek-malayalam', 'anek-kannada']) {
+    app.use(`/fonts/${fam}`, express.static(path.join(path.dirname(require.resolve(`@fontsource/${fam}/package.json`)), 'files'), { maxAge: '30d', immutable: true }));
+  }
   app.use('/fonts/inter', express.static(path.join(path.dirname(require.resolve('@fontsource/inter/package.json')), 'files'), { maxAge: '30d', immutable: true }));
   app.use(express.static(PUBLIC, { index: false, maxAge: DEV ? 0 : '1h' }));
-  app.get('/brochure', page('brochure', () => renderTemplate('brochure.html')));
+  app.get('/brochure', page('brochure', (lang) => renderTemplate('brochure.html', lang)));
   app.get('/admin', page('admin', () => renderPage('admin.html')));
 
   // ----- public API -----
@@ -179,14 +203,16 @@ function createApp({ store, adminToken = process.env.ADMIN_TOKEN, notify } = {})
     res.json({ nurseries: n, total: quote(n), monthly: pricing.monthly, savings: (n - 1) * (pricing.firstNursery - pricing.additionalNursery) });
   });
 
-  let brochure = null;
+  const brochures = {};
   app.get('/api/brochure', async (req, res, next) => {
     try {
-      brochure ||= await buildBrochure();
+      const lang = i18n.LANGS.includes(req.query.lang) ? req.query.lang : pickLang(req, res);
+      brochures[lang] ||= await buildBrochure(lang);
+      const brochure = brochures[lang];
       store.recordDownload().catch((err) => console.error('download count failed', err));
       res.set({
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `${req.query.inline === '1' ? 'inline' : 'attachment'}; filename="${BROCHURE_NAME}"`,
+        'Content-Disposition': `${req.query.inline === '1' ? 'inline' : 'attachment'}; filename="${lang === 'en' ? BROCHURE_NAME : BROCHURE_NAME.replace('.pdf', `-${lang}.pdf`)}"`,
         'Cache-Control': 'no-store',
       });
       res.send(brochure);
@@ -200,8 +226,10 @@ function createApp({ store, adminToken = process.env.ADMIN_TOKEN, notify } = {})
       const body = req.body || {};
       // Honeypot: real visitors never see or fill this field.
       if (body.website) return res.status(201).json({ ok: true });
-      const { enquiry, errors } = validateEnquiry(body);
-      if (Object.keys(errors).length) return res.status(400).json({ error: 'Please check the highlighted fields.', fields: errors });
+      const lang = i18n.LANGS.includes(body.lang) ? body.lang : pickLang(req, res);
+      const { enquiry, errors } = validateEnquiry(body, lang);
+      if (Object.keys(errors).length) return res.status(400).json({ error: i18n.t(lang, 'err.check'), fields: errors });
+      enquiry.lang = lang;
       const saved = await store.addEnquiry({ ...enquiry, estimate: quote(enquiry.nurseries) });
       if (notify) Promise.resolve(notify(saved)).catch((err) => console.error('notify failed', err));
       res.status(201).json({ ok: true, id: saved.id });
@@ -248,7 +276,7 @@ function createApp({ store, adminToken = process.env.ADMIN_TOKEN, notify } = {})
     }
   });
   admin.get('/enquiries.csv', (req, res) => {
-    const cols = ['createdAt', 'status', 'name', 'phone', 'email', 'nursery', 'location', 'nurseries', 'estimate', 'interest', 'message', 'notes'];
+    const cols = ['createdAt', 'status', 'name', 'phone', 'email', 'nursery', 'location', 'nurseries', 'estimate', 'interest', 'lang', 'message', 'notes'];
     const rows = [cols.join(','), ...store.listEnquiries().map((e) => cols.map((c) => csvCell(e[c])).join(','))];
     res.set({ 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': 'attachment; filename="dofida-enquiries.csv"' });
     res.send(rows.join('\n'));

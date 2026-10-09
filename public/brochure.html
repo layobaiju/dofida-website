@@ -1,45 +1,51 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{LANG}}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Plant Bill brochure · Dofida Group</title>
-  <meta name="description" content="Plant Bill by Dofida Group: billing software + printer for plant nurseries. ₹{{PRICE_FIRST}} for your first nursery, 50% off each extra one, and ₹{{MONTHLY}} a month for all your nurseries.">
+  <title>{{t.bro.title}}</title>
+  <meta name="description" content="{{t.bro.desc}}">
   <meta name="theme-color" content="#0B0F1C">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="/fonts/outfit/outfit-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/css/brochure.css">
   <script src="/js/brochure.js" defer></script>
+  <script type="application/json" id="i18n">{{I18N_JSON}}</script>
 </head>
 <body class="br">
 <div class="br-app" id="app" data-first="{{PRICE_FIRST_RAW}}" data-additional="{{PRICE_ADDITIONAL_RAW}}" data-monthly="{{MONTHLY_RAW}}">
   <div class="br-bg" aria-hidden="true"><i></i><i></i><i></i></div>
 
   <header class="br-top">
-    <a class="br-brand" href="/" target="_top" aria-label="Dofida Group home"><span data-star></span><b>Dofida</b><small>Plant Bill brochure</small></a>
+    <a class="br-brand" href="/?lang={{LANG}}" target="_top" aria-label="{{t.nav.home}}"><span data-star></span><b>Dofida</b><small>{{t.bro.small}}</small></a>
+    <div class="br-lang" role="group" aria-label="{{t.lang.label}}">
+      <a href="?lang=en" hreflang="en" lang="en" data-lang="en" title="English">EN</a>
+      <a href="?lang=ml" hreflang="ml" lang="ml" data-lang="ml" title="മലയാളം">മല</a>
+      <a href="?lang=kn" hreflang="kn" lang="kn" data-lang="kn" title="ಕನ್ನಡ">ಕನ್ನ</a>
+    </div>
     <div class="br-tools">
-      <button class="br-tool" id="play" type="button" aria-label="Pause slideshow" aria-pressed="true">
+      <button class="br-tool" id="play" type="button" aria-label="{{t.bro.pause}}" aria-pressed="true">
         <svg class="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg>
         <svg class="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></svg>
       </button>
-      <button class="br-tool" id="fs" type="button" aria-label="Full screen">
+      <button class="br-tool" id="fs" type="button" aria-label="{{t.bro.fullscreen}}">
         <svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
       </button>
-      <a class="br-tool br-tool--wide" id="openFull" href="/brochure" target="_top" aria-label="Open the brochure on its own page">
-        <svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg><span>Open</span>
+      <a class="br-tool br-tool--wide" id="openFull" href="/brochure?lang={{LANG}}" target="_top" aria-label="{{t.bro.openLabel}}">
+        <svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg><span>{{t.bro.open}}</span>
       </a>
-      <a class="br-tool br-tool--wide br-tool--accent" href="/api/brochure" download aria-label="Download the PDF brochure">
+      <a class="br-tool br-tool--wide br-tool--accent" href="/api/brochure?lang={{LANG}}" download aria-label="{{t.bro.pdfLabel}}">
         <svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>PDF</span>
       </a>
     </div>
   </header>
 
-  <nav class="br-segs" id="segs" aria-label="Slides"></nav>
+  <nav class="br-segs" id="segs" aria-label="{{t.bro.slides}}"></nav>
 
-  <main class="br-stage" id="stage" tabindex="0" aria-roledescription="carousel" aria-label="Plant Bill brochure">
+  <main class="br-stage" id="stage" tabindex="0" aria-roledescription="carousel" aria-label="{{t.bro.small}}">
 
     <!-- 1 · Cover -->
-    <section class="br-slide br-cover" data-t="split" data-title="Welcome" aria-roledescription="slide">
+    <section class="br-slide br-cover" data-t="split" data-title="{{t.bro.t1}}" aria-roledescription="slide">
       <div class="br-cover__half br-cover__half--l"></div>
       <div class="br-cover__half br-cover__half--r"></div>
       <div class="br-cover__disc" data-a="zoom">
@@ -50,161 +56,161 @@
       <div class="br-cover__foot">
         <div>
           <p class="br-cover__product" data-a="up">Plant Bill</p>
-          <p class="br-cover__tag" data-a="up">Billing software + printer for plant nurseries</p>
+          <p class="br-cover__tag" data-a="up">{{t.bro.coverTag}}</p>
         </div>
-        <p class="br-chip" data-a="left">Android · iOS · All of Kerala &amp; Karnataka</p>
+        <p class="br-chip" data-a="left">{{t.bro.coverChip}}</p>
       </div>
-      <p class="br-swipe" data-a="fade"><span>Swipe</span><i>→</i></p>
+      <p class="br-swipe" data-a="fade"><span>{{t.bro.swipe}}</span><i>→</i></p>
     </section>
 
     <!-- 2 · What is Plant Bill -->
-    <section class="br-slide" data-t="wipe" data-title="What it is" aria-roledescription="slide">
+    <section class="br-slide" data-t="wipe" data-title="{{t.bro.t2}}" aria-roledescription="slide">
       <div class="br-grid">
         <div class="br-copy">
-          <p class="br-eyebrow" data-a="left">What is Plant Bill</p>
-          <h2 class="br-h" data-a="up">Billing made for plant nurseries.</h2>
-          <p class="br-p" data-a="up">Bill customers from your phone, print the receipt on the printer that comes in the box, and keep track of every sale.</p>
+          <p class="br-eyebrow" data-a="left">{{t.bro.whatEyebrow}}</p>
+          <h2 class="br-h" data-a="up">{{t.bro.whatH}}</h2>
+          <p class="br-p" data-a="up">{{t.bro.whatP}}</p>
           <ul class="br-dots">
-            <li data-a="left">Works on Android and iOS</li>
-            <li data-a="left">Billing printer included</li>
-            <li data-a="left">Serving all of Kerala &amp; Karnataka</li>
+            <li data-a="left">{{t.bro.what1}}</li>
+            <li data-a="left">{{t.bro.what2}}</li>
+            <li data-a="left">{{t.bro.what3}}</li>
           </ul>
         </div>
         <div class="br-art br-art--phone" data-a="right">
           <div class="br-phone">
             <div class="br-phone__bar"><span data-star></span>Plant Bill<i></i></div>
             <ul class="br-phone__items">
-              <li><span>Areca Palm × 2</span><b>₹700</b></li>
-              <li><span>Money Plant × 3</span><b>₹360</b></li>
-              <li><span>Hibiscus × 1</span><b>₹180</b></li>
-              <li><span>Rose (Grafted) × 4</span><b>₹360</b></li>
+              <li><span>{{t.plant.areca}} × 2</span><b>₹700</b></li>
+              <li><span>{{t.plant.money}} × 3</span><b>₹360</b></li>
+              <li><span>{{t.plant.hibiscus}} × 1</span><b>₹180</b></li>
+              <li><span>{{t.plant.rose}} × 4</span><b>₹360</b></li>
             </ul>
-            <div class="br-phone__total"><span>Total</span><b>₹<span data-count="1600">0</span></b></div>
-            <div class="br-phone__btn">Print bill</div>
+            <div class="br-phone__total"><span>{{t.app.total}}</span><b>₹<span data-count="1600">0</span></b></div>
+            <div class="br-phone__btn">{{t.app.print}}</div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- 3 · Features -->
-    <section class="br-slide" data-t="zoom" data-title="Features" aria-roledescription="slide">
-      <p class="br-eyebrow br-center" data-a="down">Features</p>
-      <h2 class="br-h br-center" data-a="up">Everything a nursery counter needs.</h2>
+    <section class="br-slide" data-t="zoom" data-title="{{t.bro.t3}}" aria-roledescription="slide">
+      <p class="br-eyebrow br-center" data-a="down">{{t.bro.t3}}</p>
+      <h2 class="br-h br-center" data-a="up">{{t.bro.featH}}</h2>
       <div class="br-tiles">
-        <div class="br-tile" data-a="pop"><i><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></i><b>Bill in seconds</b><span>From your own plant catalogue</span></div>
-        <div class="br-tile" data-a="pop"><i><svg viewBox="0 0 24 24"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M7 14h10v7H7z"/></svg></i><b>Printer included</b><span>Receipts on the spot</span></div>
-        <div class="br-tile" data-a="pop"><i><svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg></i><b>Android &amp; iOS</b><span>Use the phones you have</span></div>
-        <div class="br-tile" data-a="pop"><i><svg viewBox="0 0 24 24"><path d="M12 21c-5-2-8-6-8-11 4 0 7 1.5 8 5 1-3.5 4-5 8-5 0 5-3 9-8 11zM12 15V8M12 8c0-2.5 1-4 3-5"/></svg></i><b>Plant catalogue</b><span>Prices and sizes for every variety</span></div>
-        <div class="br-tile" data-a="pop"><i><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></i><b>Sales at a glance</b><span>Today, this week, this month</span></div>
-        <div class="br-tile" data-a="pop"><i><svg viewBox="0 0 24 24"><path d="M3 21V10l5-4 5 4v11M13 21v-7l4-3 4 3v7M2 21h20M7 21v-4h2v4"/></svg></i><b>Many nurseries</b><span>{{DISCOUNT}}% off each extra one</span></div>
+        <div class="br-tile" data-a="pop"><i><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></i><b>{{t.bro.f1}}</b><span>{{t.bro.f1s}}</span></div>
+        <div class="br-tile" data-a="pop"><i><svg viewBox="0 0 24 24"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M7 14h10v7H7z"/></svg></i><b>{{t.bro.f2}}</b><span>{{t.bro.f2s}}</span></div>
+        <div class="br-tile" data-a="pop"><i><svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg></i><b>{{t.bro.f3}}</b><span>{{t.bro.f3s}}</span></div>
+        <div class="br-tile" data-a="pop"><i><svg viewBox="0 0 24 24"><path d="M12 21c-5-2-8-6-8-11 4 0 7 1.5 8 5 1-3.5 4-5 8-5 0 5-3 9-8 11zM12 15V8M12 8c0-2.5 1-4 3-5"/></svg></i><b>{{t.bro.f4}}</b><span>{{t.bro.f4s}}</span></div>
+        <div class="br-tile" data-a="pop"><i><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></i><b>{{t.bro.f5}}</b><span>{{t.bro.f5s}}</span></div>
+        <div class="br-tile" data-a="pop"><i><svg viewBox="0 0 24 24"><path d="M3 21V10l5-4 5 4v11M13 21v-7l4-3 4 3v7M2 21h20M7 21v-4h2v4"/></svg></i><b>{{t.bro.f6}}</b><span>{{t.bro.f6s}}</span></div>
       </div>
     </section>
 
     <!-- 4 · Printer -->
-    <section class="br-slide" data-t="circle" data-title="Printer" aria-roledescription="slide">
+    <section class="br-slide" data-t="circle" data-title="{{t.bro.t4}}" aria-roledescription="slide">
       <div class="br-grid br-grid--rev">
         <div class="br-art br-art--printer" data-a="zoom">
           <div class="br-printer">
             <div class="br-printer__paper">
               <b>DOFIDA · PLANT BILL</b>
-              <div><span>Areca Palm ×2</span><span>700</span></div>
-              <div><span>Money Plant ×3</span><span>360</span></div>
-              <div><span>Hibiscus ×1</span><span>180</span></div>
-              <div class="t"><span>TOTAL</span><span>₹1,240</span></div>
-              <small>Thank you · Visit again</small>
+              <div><span>{{t.plant.areca}} ×2</span><span>700</span></div>
+              <div><span>{{t.plant.money}} ×3</span><span>360</span></div>
+              <div><span>{{t.plant.hibiscus}} ×1</span><span>180</span></div>
+              <div class="t"><span>{{t.app.total}}</span><span>₹1,240</span></div>
+              <small>{{t.app.thanks}}</small>
             </div>
             <div class="br-printer__body"><i></i></div>
           </div>
         </div>
         <div class="br-copy">
-          <p class="br-eyebrow" data-a="left">In the box</p>
-          <h2 class="br-h" data-a="up">A billing printer comes with every nursery.</h2>
+          <p class="br-eyebrow" data-a="left">{{t.bro.boxEyebrow}}</p>
+          <h2 class="br-h" data-a="up">{{t.bro.boxH}}</h2>
           <ul class="br-checks">
-            <li data-a="left"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Pairs with your phone</li>
-            <li data-a="left"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Print the bill while the customer waits</li>
-            <li data-a="left"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Included in the price, for every nursery</li>
+            <li data-a="left"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{t.bro.box1}}</li>
+            <li data-a="left"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{t.bro.box2}}</li>
+            <li data-a="left"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{t.bro.box3}}</li>
           </ul>
         </div>
       </div>
     </section>
 
     <!-- 5 · How it works -->
-    <section class="br-slide" data-t="rise" data-title="How it works" aria-roledescription="slide">
-      <p class="br-eyebrow" data-a="left">How it works</p>
-      <h2 class="br-h" data-a="up">From enquiry to your first printed bill.</h2>
+    <section class="br-slide" data-t="rise" data-title="{{t.bro.t5}}" aria-roledescription="slide">
+      <p class="br-eyebrow" data-a="left">{{t.bro.t5}}</p>
+      <h2 class="br-h" data-a="up">{{t.bro.howH}}</h2>
       <ol class="br-steps">
-        <li data-a="up"><i>1</i><b>Enquire</b><span>Tell us about your nursery</span></li>
-        <li data-a="up"><i>2</i><b>Set up</b><span>App installed, printer paired</span></li>
-        <li data-a="up"><i>3</i><b>Train</b><span>You and your staff</span></li>
-        <li data-a="up"><i>4</i><b>Grow</b><span>Add nurseries at {{DISCOUNT}}% off</span></li>
+        <li data-a="up"><i>1</i><b>{{t.bro.s1}}</b><span>{{t.bro.s1s}}</span></li>
+        <li data-a="up"><i>2</i><b>{{t.bro.s2}}</b><span>{{t.bro.s2s}}</span></li>
+        <li data-a="up"><i>3</i><b>{{t.bro.s3}}</b><span>{{t.bro.s3s}}</span></li>
+        <li data-a="up"><i>4</i><b>{{t.bro.s4}}</b><span>{{t.bro.s4s}}</span></li>
       </ol>
     </section>
 
     <!-- 6 · One-time price -->
-    <section class="br-slide" data-t="flip" data-title="Pricing" aria-roledescription="slide">
-      <p class="br-eyebrow br-center" data-a="down">Pricing · one time</p>
-      <h2 class="br-h br-center" data-a="up">One simple price. Printer included.</h2>
+    <section class="br-slide" data-t="flip" data-title="{{t.bro.t6}}" aria-roledescription="slide">
+      <p class="br-eyebrow br-center" data-a="down">{{t.bro.priceEyebrow}}</p>
+      <h2 class="br-h br-center" data-a="up">{{t.bro.priceH}}</h2>
       <div class="br-prices">
         <div class="br-price br-price--dark" data-a="flip">
-          <small>First nursery</small>
+          <small>{{t.bro.first}}</small>
           <b>₹<span data-count="{{PRICE_FIRST_RAW}}">0</span></b>
-          <span>Software + printer</span>
+          <span>{{t.bro.firstS}}</span>
         </div>
         <div class="br-price" data-a="flip">
           <em class="br-stamp">-{{DISCOUNT}}%</em>
-          <small>Each extra nursery</small>
+          <small>{{t.bro.extra}}</small>
           <b>₹<span data-count="{{PRICE_ADDITIONAL_RAW}}">0</span></b>
-          <span>Same owner · printer included</span>
+          <span>{{t.bro.extraS}}</span>
         </div>
       </div>
-      <p class="br-note br-center" data-a="fade">Plus ₹{{MONTHLY}} a month for all your nurseries. Next slide →</p>
+      <p class="br-note br-center" data-a="fade">{{t.bro.priceNote}}</p>
     </section>
 
     <!-- 7 · Monthly -->
-    <section class="br-slide br-monthly" data-t="diagonal" data-title="Monthly plan" aria-roledescription="slide">
-      <p class="br-eyebrow br-center" data-a="down">Monthly subscription</p>
+    <section class="br-slide br-monthly" data-t="diagonal" data-title="{{t.bro.t7}}" aria-roledescription="slide">
+      <p class="br-eyebrow br-center" data-a="down">{{t.bro.monthEyebrow}}</p>
       <div class="br-monthly__price" data-a="zoom">
-        <b>₹<span data-count="{{MONTHLY_RAW}}">0</span></b><span>/ month</span>
+        <b>₹<span data-count="{{MONTHLY_RAW}}">0</span></b><span>{{t.bro.perMonth}}</span>
       </div>
-      <p class="br-monthly__line" data-a="up">One flat fee, <strong>no matter how many nurseries you have.</strong></p>
+      <p class="br-monthly__line" data-a="up">{{t.bro.monthLine}}</p>
       <div class="br-monthly__demo" data-a="up" aria-live="off">
         <div class="br-houses" id="houses"></div>
-        <p class="br-monthly__count"><span id="houseCount">1</span> <span id="houseWord">nursery</span> → <b>₹{{MONTHLY}}</b> / month</p>
+        <p class="br-monthly__count"><span id="houseCount">1</span> <span id="houseWord">{{t.bro.nursery}}</span> → <b>₹{{MONTHLY}}</b> {{t.bro.perMonth}}</p>
       </div>
     </section>
 
     <!-- 8 · Calculator -->
-    <section class="br-slide" data-t="zoom" data-title="Your price" aria-roledescription="slide">
-      <p class="br-eyebrow br-center" data-a="down">Work out your price</p>
-      <h2 class="br-h br-center" data-a="up">How many nurseries do you own?</h2>
+    <section class="br-slide" data-t="zoom" data-title="{{t.bro.t8}}" aria-roledescription="slide">
+      <p class="br-eyebrow br-center" data-a="down">{{t.bro.calcEyebrow}}</p>
+      <h2 class="br-h br-center" data-a="up">{{t.bro.calcH}}</h2>
       <div class="br-calc" data-a="up">
         <div class="br-calc__ctrl">
-          <button type="button" class="br-round" data-step="-1" aria-label="Fewer nurseries">−</button>
+          <button type="button" class="br-round" data-step="-1" aria-label="{{t.calc.fewer}}">−</button>
           <output id="calcN">1</output>
-          <button type="button" class="br-round" data-step="1" aria-label="More nurseries">+</button>
+          <button type="button" class="br-round" data-step="1" aria-label="{{t.calc.more}}">+</button>
         </div>
-        <input type="range" id="calcRange" min="1" max="20" value="1" aria-label="Number of nurseries">
+        <input type="range" id="calcRange" min="1" max="20" value="1" aria-label="{{t.bro.calcRange}}">
         <div class="br-calc__out">
-          <div><small>One time</small><b>₹<span id="calcOnce">{{PRICE_FIRST}}</span></b></div>
-          <div><small>Monthly</small><b>₹{{MONTHLY}}</b><em>for all nurseries</em></div>
-          <div class="br-calc__year"><small>First year total</small><b>₹<span id="calcYear">0</span></b><em>one time + 12 months</em></div>
+          <div><small>{{t.bro.once}}</small><b>₹<span id="calcOnce">{{PRICE_FIRST}}</span></b></div>
+          <div><small>{{t.bro.monthly}}</small><b>₹{{MONTHLY}}</b><em>{{t.bro.forAll}}</em></div>
+          <div class="br-calc__year"><small>{{t.bro.year}}</small><b>₹<span id="calcYear">0</span></b><em>{{t.bro.yearS}}</em></div>
         </div>
         <div class="br-calc__bar" id="calcBar" aria-hidden="true"></div>
       </div>
     </section>
 
     <!-- 9 · Included -->
-    <section class="br-slide" data-t="wipe" data-title="What's included" aria-roledescription="slide">
+    <section class="br-slide" data-t="wipe" data-title="{{t.bro.t9}}" aria-roledescription="slide">
       <div class="br-grid">
         <div class="br-copy">
-          <p class="br-eyebrow" data-a="left">What you get</p>
-          <h2 class="br-h" data-a="up">Everything you need on day one.</h2>
+          <p class="br-eyebrow" data-a="left">{{t.bro.inclEyebrow}}</p>
+          <h2 class="br-h" data-a="up">{{t.bro.inclH}}</h2>
           <ul class="br-checks br-checks--boxed">
-            <li data-a="left"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Plant Bill app (Android &amp; iOS)</li>
-            <li data-a="left"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Billing printer for every nursery</li>
-            <li data-a="left"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Setup with your plant list</li>
-            <li data-a="left"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Training for you and your staff</li>
-            <li data-a="left"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>₹{{MONTHLY}}/month covers all your nurseries</li>
+            <li data-a="left"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{t.bro.incl1}}</li>
+            <li data-a="left"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{t.bro.incl2}}</li>
+            <li data-a="left"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{t.bro.incl3}}</li>
+            <li data-a="left"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{t.bro.incl4}}</li>
+            <li data-a="left"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{t.bro.incl5}}</li>
           </ul>
         </div>
         <div class="br-art br-art--star" data-a="spin"><span data-star></span></div>
@@ -212,33 +218,33 @@
     </section>
 
     <!-- 10 · Services -->
-    <section class="br-slide" data-t="flip" data-title="Our services" aria-roledescription="slide">
-      <p class="br-eyebrow br-center" data-a="down">Beyond Plant Bill</p>
-      <h2 class="br-h br-center" data-a="up">We build for every kind of business.</h2>
+    <section class="br-slide" data-t="flip" data-title="{{t.bro.t10}}" aria-roledescription="slide">
+      <p class="br-eyebrow br-center" data-a="down">{{t.bro.svcEyebrow}}</p>
+      <h2 class="br-h br-center" data-a="up">{{t.bro.svcH}}</h2>
       <div class="br-services">
-        <div class="br-service br-service--main" data-a="pop"><i>01</i><b>Plant Bill</b><span>Billing software + printer for nurseries</span></div>
-        <div class="br-service" data-a="pop"><i>02</i><b>Websites</b><span>Designed and built for any company</span></div>
-        <div class="br-service" data-a="pop"><i>03</i><b>Website maintenance</b><span>Updates, fixes and keeping your site running</span></div>
-        <div class="br-service" data-a="pop"><i>04</i><b>Mobile apps</b><span>Android and iOS apps</span></div>
-        <div class="br-service" data-a="pop"><i>05</i><b>E-commerce</b><span>Online stores that take orders</span></div>
-        <div class="br-service" data-a="pop"><i>06</i><b>Custom software</b><span>Billing, business tools and much more</span></div>
+        <div class="br-service br-service--main" data-a="pop"><i>01</i><b>Plant Bill</b><span>{{t.bro.sv1s}}</span></div>
+        <div class="br-service" data-a="pop"><i>02</i><b>{{t.svc.web}}</b><span>{{t.bro.sv2s}}</span></div>
+        <div class="br-service" data-a="pop"><i>03</i><b>{{t.svc.maint}}</b><span>{{t.bro.sv3s}}</span></div>
+        <div class="br-service" data-a="pop"><i>04</i><b>{{t.svc.apps}}</b><span>{{t.bro.sv4s}}</span></div>
+        <div class="br-service" data-a="pop"><i>05</i><b>{{t.svc.ecom}}</b><span>{{t.bro.sv5s}}</span></div>
+        <div class="br-service" data-a="pop"><i>06</i><b>{{t.svc.customShort}}</b><span>{{t.bro.sv6s}}</span></div>
       </div>
     </section>
 
     <!-- 11 · Contact -->
-    <section class="br-slide" data-t="circle" data-title="Talk to us" aria-roledescription="slide">
+    <section class="br-slide" data-t="circle" data-title="{{t.bro.t11}}" aria-roledescription="slide">
       <div class="br-grid">
         <div class="br-copy">
-          <p class="br-eyebrow" data-a="left">Talk to us</p>
-          <h2 class="br-h" data-a="up">Ready to bill smarter?</h2>
-          <p class="br-p" data-a="up">We serve plant nurseries across <strong>all of Kerala and Karnataka</strong>, from our offices in Calicut and Hunsur.</p>
+          <p class="br-eyebrow" data-a="left">{{t.bro.t11}}</p>
+          <h2 class="br-h" data-a="up">{{t.bro.talkH}}</h2>
+          <p class="br-p" data-a="up">{{t.bro.talkP}}</p>
           <div class="br-places">
-            <div data-a="up"><i></i><b>Calicut</b><span>Kerala</span></div>
-            <div data-a="up"><i></i><b>Hunsur</b><span>Karnataka</span></div>
+            <div data-a="up"><i></i><b>{{t.bro.calicut}}</b><span>{{t.loc.kerala}}</span></div>
+            <div data-a="up"><i></i><b>{{t.bro.hunsur}}</b><span>{{t.loc.karnataka}}</span></div>
           </div>
           <div class="br-ctas" data-a="up">
-            <a class="br-btn" href="/#enquire" target="_top">Send an enquiry →</a>
-            <a class="br-btn br-btn--ghost" href="/api/brochure" download>Download PDF ↓</a>
+            <a class="br-btn" href="/?lang={{LANG}}#enquire" target="_top">{{t.bro.sendEnquiry}}</a>
+            <a class="br-btn br-btn--ghost" href="/api/brochure?lang={{LANG}}" download>{{t.bro.downloadPdf}}</a>
           </div>
         </div>
         <div class="br-art br-art--map" data-a="fade">
@@ -247,8 +253,8 @@
             <path class="br-map__route" d="M120 210 C 160 120, 230 90, 320 90"/>
             <g transform="translate(120 210)"><circle class="br-map__pulse" r="14"/><circle class="br-map__dot" r="7"/></g>
             <g transform="translate(320 90)"><circle class="br-map__pulse br-map__pulse--b" r="14"/><circle class="br-map__dot br-map__dot--b" r="7"/></g>
-            <text x="92" y="246">Calicut</text>
-            <text x="296" y="64">Hunsur</text>
+            <text x="92" y="246">{{t.bro.calicut}}</text>
+            <text x="296" y="64">{{t.bro.hunsur}}</text>
           </svg>
         </div>
       </div>
@@ -257,12 +263,12 @@
   </main>
 
   <footer class="br-foot">
-    <button class="br-round br-round--lg" id="prev" type="button" aria-label="Previous slide">←</button>
+    <button class="br-round br-round--lg" id="prev" type="button" aria-label="{{t.bro.prev}}">←</button>
     <div class="br-foot__mid">
       <span class="br-count" id="count">01 / 11</span>
-      <span class="br-title" id="title" aria-live="polite">Welcome</span>
+      <span class="br-title" id="title" aria-live="polite">{{t.bro.t1}}</span>
     </div>
-    <button class="br-round br-round--lg br-round--accent" id="next" type="button" aria-label="Next slide">→</button>
+    <button class="br-round br-round--lg br-round--accent" id="next" type="button" aria-label="{{t.bro.next}}">→</button>
   </footer>
 </div>
 </body>

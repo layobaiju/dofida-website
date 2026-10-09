@@ -14,7 +14,11 @@
     "node": ">=20.12"
   },
   "dependencies": {
+    "@fontsource/anek-kannada": "^5.3.0",
+    "@fontsource/anek-malayalam": "^5.3.0",
     "@fontsource/inter": "^5.3.0",
+    "@fontsource/noto-sans-kannada": "^5.3.0",
+    "@fontsource/noto-sans-malayalam": "^5.3.0",
     "@fontsource/outfit": "^5.3.0",
     "express": "^5.2.1",
     "pdfkit": "^0.17.2"

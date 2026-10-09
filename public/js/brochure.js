@@ -7,6 +7,13 @@
   const inr = (n) => Math.round(n).toLocaleString('en-IN');
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // Strings in the page's language, provided by the server.
+  let STR = {};
+  try { STR = JSON.parse($('#i18n')?.textContent || '{}'); } catch { /* fall back to keys */ }
+  const tr = (key, vals = {}) => (STR[key] || key).replace(/\{(\w+)\}/g, (m, k) => (k in vals ? vals[k] : m));
+  const LANG = document.documentElement.lang || 'en';
+  $$('.br-lang a').forEach((a) => a.setAttribute('aria-current', String(a.dataset.lang === LANG)));
+
   const app = $('#app');
   const stage = $('#stage');
   const slides = $$('.br-slide', stage);
@@ -31,14 +38,14 @@
   // ---------- Stagger: each animated element waits a little longer than the last ----------
   slides.forEach((slide, n) => {
     $$('[data-a], .br-steps li, .br-checks li', slide).forEach((el, i) => el.style.setProperty('--i', i));
-    slide.setAttribute('aria-label', `${n + 1} of ${slides.length}: ${slide.dataset.title}`);
+    slide.setAttribute('aria-label', tr('bro.slideOf', { n: n + 1, total: slides.length, title: slide.dataset.title }));
   });
 
   // ---------- Progress segments ----------
   slides.forEach((slide, i) => {
     const b = document.createElement('button');
     b.type = 'button';
-    b.setAttribute('aria-label', `Slide ${i + 1}: ${slide.dataset.title}`);
+    b.setAttribute('aria-label', tr('bro.goTo', { n: i + 1, title: slide.dataset.title }));
     b.innerHTML = '<span></span>';
     b.addEventListener('click', () => go(i));
     segs.appendChild(b);
@@ -142,7 +149,7 @@
       if (n === 1) box.innerHTML = '';
       box.insertAdjacentHTML('beforeend', HOUSE);
       count.textContent = n;
-      word.textContent = n === 1 ? 'nursery' : 'nurseries';
+      word.textContent = n === 1 ? tr('bro.nursery') : tr('bro.nurseries');
     };
     step();
     houseTimer = setInterval(step, reduceMotion ? 1500 : 650);
@@ -177,7 +184,7 @@
   function setPlaying(p) {
     playing = p;
     playBtn.setAttribute('aria-pressed', String(p));
-    playBtn.setAttribute('aria-label', p ? 'Pause slideshow' : 'Play slideshow');
+    playBtn.setAttribute('aria-label', p ? tr('bro.pause') : tr('bro.play'));
   }
   setPlaying(playing);
   playBtn.addEventListener('click', () => setPlaying(!playing));
