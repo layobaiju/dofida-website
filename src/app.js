@@ -8,6 +8,8 @@ const { buildBrochure } = require('./brochure');
 const PUBLIC = path.join(__dirname, '..', 'public');
 const STATUSES = ['new', 'contacted', 'demo', 'won', 'closed'];
 const BROCHURE_NAME = 'Dofida-Plant-Bill-Brochure.pdf';
+// `npm run dev` (node --watch) re-reads pages on every request; otherwise they are cached.
+const DEV = process.execArgv.includes('--watch') || process.env.NODE_ENV === 'development';
 
 // ---------- helpers ----------
 
@@ -118,14 +120,14 @@ function createApp({ store, adminToken = process.env.ADMIN_TOKEN, notify } = {})
   // Index is templated from config so prices are always in sync with the PDF.
   let indexCache = null;
   const sendIndex = (req, res) => {
-    if (!indexCache || process.env.NODE_ENV !== 'production') indexCache = renderIndex();
+    if (!indexCache || DEV) indexCache = renderIndex();
     res.type('html').send(indexCache);
   };
   app.get(['/', '/index.html'], sendIndex);
 
   app.use('/fonts/outfit', express.static(path.join(path.dirname(require.resolve('@fontsource/outfit/package.json')), 'files'), { maxAge: '30d', immutable: true }));
   app.use('/fonts/inter', express.static(path.join(path.dirname(require.resolve('@fontsource/inter/package.json')), 'files'), { maxAge: '30d', immutable: true }));
-  app.use(express.static(PUBLIC, { index: false, maxAge: process.env.NODE_ENV === 'production' ? '1h' : 0 }));
+  app.use(express.static(PUBLIC, { index: false, maxAge: DEV ? 0 : '1h' }));
   app.get('/admin', (req, res) => res.sendFile(path.join(PUBLIC, 'admin.html')));
 
   // ----- public API -----

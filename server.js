@@ -1,4 +1,11 @@
+const fs = require('fs');
 const path = require('path');
+
+// Settings such as ADMIN_TOKEN can live in a .env file next to this one (see .env.example).
+// This works the same on Windows, macOS and Linux.
+const envFile = path.join(__dirname, '.env');
+if (fs.existsSync(envFile)) process.loadEnvFile(envFile);
+
 const { createApp } = require('./src/app');
 const { createStore } = require('./src/store');
 

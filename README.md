@@ -9,23 +9,64 @@ The website for **Dofida Group** and its product **Plant Bill**: billing softwar
 - **Admin dashboard** at `/admin` to read enquiries, set their status, add notes and export CSV
 - Offices: Calicut, Kerala and Hunsur, Karnataka
 
-## Run it
+## Run it on your computer (Windows)
 
-Requires Node.js 20 or newer.
+You need two free programs installed once: **Node.js** (LTS version, from nodejs.org) and **Git** (from git-scm.com). Install both with the default options.
+
+**First time: download the code into Documents\dofida-website**
+
+Open **Command Prompt** and run:
+
+```bat
+cd %USERPROFILE%\Documents
+git clone -b claude/dofida-animated-website-cpt52z https://github.com/layobaiju/dofida-website.git "dofida-website"
+cd dofida-website
+npm install
+copy .env.example .env
+notepad .env
+```
+
+In Notepad, change `ADMIN_TOKEN` to a password of your choice, then save and close.
+
+**Start the website**
+
+```bat
+cd %USERPROFILE%\Documents\dofida-website
+npm start
+```
+
+Open http://localhost:3000 in your browser. The admin dashboard is at http://localhost:3000/admin. Press `Ctrl + C` in Command Prompt to stop the site.
+
+**Get the latest changes** (after Claude pushes an update)
+
+```bat
+cd %USERPROFILE%\Documents\dofida-website
+git pull
+npm install
+npm start
+```
+
+**Send your own changes to GitHub** (if you edit files yourself)
+
+```bat
+git add -A
+git commit -m "Describe what you changed"
+git push
+```
+
+## Other commands
 
 ```bash
-npm install
-ADMIN_TOKEN=choose-a-long-secret npm start     # http://localhost:3000
-npm run dev                                    # auto-restarts on file changes
-npm test                                       # backend tests
-npm run brochure                               # save the PDF brochure to disk
+npm run dev        # auto-restarts when you edit code
+npm test           # backend tests
+npm run brochure   # save the PDF brochure to disk
 ```
 
 ## Configuration
 
 Prices, features, locations and contact details are in **`src/config.js`**. The website, the slide deck and the PDF brochure all read from it, so you only change a price in one place.
 
-Environment variables:
+Settings go in a `.env` file in the project folder (copy `.env.example` to start). It is private and never uploaded to GitHub. You can also set them as normal environment variables.
 
 | Variable | Purpose |
 | --- | --- |
