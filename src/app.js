@@ -17,8 +17,25 @@ function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 }
 
+// Adds ?v=<content hash> to local CSS/JS/image links, so browsers always fetch the
+// new file after an update instead of mixing a cached old stylesheet with new HTML.
+function versionAssets(html) {
+  return html.replace(/(href|src)="(\/(?:css|js|img)\/[^"?#]+)"/g, (m, attr, url) => {
+    try {
+      const hash = crypto.createHash('sha1').update(fs.readFileSync(path.join(PUBLIC, url))).digest('hex').slice(0, 10);
+      return `${attr}="${url}?v=${hash}"`;
+    } catch {
+      return m;
+    }
+  });
+}
+
+function renderPage(file) {
+  return versionAssets(fs.readFileSync(path.join(PUBLIC, file), 'utf8'));
+}
+
 function renderIndex() {
-  const tpl = fs.readFileSync(path.join(PUBLIC, 'index.html'), 'utf8');
+  const tpl = renderPage('index.html');
   const contactLines = [
     company.contact.phone && `<a href="tel:${escapeHtml(company.contact.phone.replace(/\s/g, ''))}">${escapeHtml(company.contact.phone)}</a>`,
     company.contact.whatsapp && `<a href="https://wa.me/${escapeHtml(company.contact.whatsapp.replace(/\D/g, ''))}" target="_blank" rel="noopener">WhatsApp ${escapeHtml(company.contact.whatsapp)}</a>`,
@@ -118,17 +135,19 @@ function createApp({ store, adminToken = process.env.ADMIN_TOKEN, notify } = {})
   app.use(express.json({ limit: '20kb' }));
 
   // Index is templated from config so prices are always in sync with the PDF.
-  let indexCache = null;
-  const sendIndex = (req, res) => {
-    if (!indexCache || DEV) indexCache = renderIndex();
-    res.type('html').send(indexCache);
+  // HTML is always revalidated; the assets it links to carry a content hash.
+  const pages = {};
+  const page = (name, render) => (req, res) => {
+    if (!pages[name] || DEV) pages[name] = render();
+    res.set('Cache-Control', 'no-cache').type('html').send(pages[name]);
   };
+  const sendIndex = page('index', renderIndex);
   app.get(['/', '/index.html'], sendIndex);
 
   app.use('/fonts/outfit', express.static(path.join(path.dirname(require.resolve('@fontsource/outfit/package.json')), 'files'), { maxAge: '30d', immutable: true }));
   app.use('/fonts/inter', express.static(path.join(path.dirname(require.resolve('@fontsource/inter/package.json')), 'files'), { maxAge: '30d', immutable: true }));
   app.use(express.static(PUBLIC, { index: false, maxAge: DEV ? 0 : '1h' }));
-  app.get('/admin', (req, res) => res.sendFile(path.join(PUBLIC, 'admin.html')));
+  app.get('/admin', page('admin', () => renderPage('admin.html')));
 
   // ----- public API -----
 
@@ -231,7 +250,8 @@ function createApp({ store, adminToken = process.env.ADMIN_TOKEN, notify } = {})
   app.use('/api/admin', admin);
 
   app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));
-  app.use((req, res) => res.status(404).sendFile(path.join(PUBLIC, '404.html')));
+  const notFound = page('404', () => renderPage('404.html'));
+  app.use((req, res) => { res.status(404); notFound(req, res); });
 
   // eslint-disable-next-line no-unused-vars
   app.use((err, req, res, next) => {

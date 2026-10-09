@@ -3,8 +3,7 @@
   var themes = ['paper', 'midnight', 'sage'];
   var saved = null;
   try { saved = localStorage.getItem('dofida-theme'); } catch (e) { /* storage blocked */ }
-  if (themes.indexOf(saved) === -1) {
-    saved = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'midnight' : 'paper';
-  }
+  // First visit: the dark Midnight theme. Visitors can switch with the theme button.
+  if (themes.indexOf(saved) === -1) saved = 'midnight';
   if (saved !== 'paper') document.documentElement.setAttribute('data-theme', saved);
 })();

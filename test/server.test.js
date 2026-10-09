@@ -46,6 +46,16 @@ test('home page renders with prices filled in and security headers', async () =>
   assert.equal(res.headers.get('x-powered-by'), null);
 });
 
+test('pages link versioned assets and are never served stale', async () => {
+  const res = await fetch(base);
+  assert.equal(res.headers.get('cache-control'), 'no-cache');
+  const html = await res.text();
+  assert.match(html, /href="\/css\/style\.css\?v=[0-9a-f]{10}"/);
+  assert.match(html, /src="\/js\/main\.js\?v=[0-9a-f]{10}"/);
+  const admin = await (await fetch(`${base}/admin`)).text();
+  assert.match(admin, /\/css\/admin\.css\?v=[0-9a-f]{10}/);
+});
+
 test('static assets and fonts are served', async () => {
   for (const p of ['/css/style.css', '/js/main.js', '/img/logo-mark.svg', '/fonts/outfit/outfit-latin-700-normal.woff2', '/admin']) {
     const res = await fetch(base + p);

@@ -13,6 +13,26 @@
     set(k, v) { try { sessionStorage.setItem(k, v); } catch { /* private mode */ } },
   };
 
+  // ---------------- Always open at the top ----------------
+  // Browsers restore the last scroll position (and jump to any #section in the
+  // address) on reload. The site always starts at the top with the intro.
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+  scrollTo(0, 0);
+  addEventListener('pageshow', (e) => { if (e.persisted) scrollTo(0, 0); });
+
+  // In-page links scroll smoothly without adding #section to the address.
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest?.('a[href^="#"]');
+    if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey) return;
+    const id = a.getAttribute('href').slice(1);
+    const target = id ? document.getElementById(id) : null;
+    if (!target && id !== 'top') return;
+    e.preventDefault();
+    const y = target ? target.getBoundingClientRect().top + scrollY - (id === 'top' ? 0 : 20) : 0;
+    scrollTo({ top: id === 'top' ? 0 : y, behavior: reduceMotion ? 'auto' : 'smooth' });
+  });
+
   // ---------------- Intro: split-down reveal ----------------
   const intro = $('#intro');
   let introDone = false;
@@ -24,10 +44,6 @@
     document.body.classList.remove('is-loading');
     document.body.classList.add('is-ready');
     setTimeout(() => intro.classList.add('is-gone'), 1300);
-    if (location.hash) {
-      const target = document.getElementById(location.hash.slice(1));
-      if (target) setTimeout(() => target.scrollIntoView(), 50);
-    }
   }
   const seen = store.get('dofida-intro');
   const introDelay = reduceMotion ? 0 : seen ? 1200 : 2700;
@@ -307,9 +323,18 @@
       const meta = $('meta[name="theme-color"]');
       if (meta) meta.content = getComputedStyle(document.body).backgroundColor;
     };
+    const menu = $('#themeMenu');
+    let closeTimer;
     const setOpen = (open) => {
-      themeWrap.classList.toggle('is-open', open);
+      clearTimeout(closeTimer);
       btn.setAttribute('aria-expanded', String(open));
+      if (open) {
+        menu.hidden = false;
+        requestAnimationFrame(() => requestAnimationFrame(() => themeWrap.classList.add('is-open')));
+      } else {
+        themeWrap.classList.remove('is-open');
+        closeTimer = setTimeout(() => { menu.hidden = true; }, 400);
+      }
     };
     const apply = (theme) => {
       if (theme === 'paper') document.documentElement.removeAttribute('data-theme');

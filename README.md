@@ -8,7 +8,7 @@ The website for **Dofida Group** and its product **Plant Bill**: billing softwar
 - **Enquiry form** backed by an API, with validation, spam protection and rate limiting
 - **Admin dashboard** at `/admin` to read enquiries, set their status, add notes and export CSV
 - Offices: Calicut, Kerala and Hunsur, Karnataka
-- Three themes (Paper, Midnight, Sage) with a circular reveal when switching; the choice is remembered
+- Dark Midnight theme by default (dark everywhere, including slides and mockups), plus Paper and Sage themes with a circular reveal when switching; the choice is remembered
 - Drag-to-compare "bill book vs Plant Bill" slider, FAQ, back-to-top progress ring and toast messages
 
 ## Run it on your computer (Windows)
