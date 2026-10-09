@@ -1,0 +1,34 @@
+[hidden] { display: none !important; }
+.admin { min-height: 100vh; }
+.admin__top { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding: 20px var(--gutter); border-bottom: 1px solid var(--line); background: var(--white); }
+.admin__actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.admin__actions[hidden] { display: none; }
+.admin__main { max-width: 1100px; margin: 0 auto; padding: 40px var(--gutter) 80px; }
+.admin__login { max-width: 440px; margin: 8vh auto 0; }
+.admin__login .h2 { font-size: 40px; }
+.admin__stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+.admin__stats .fact b { font-size: 44px; }
+.admin__filter { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.admin__filter input, .admin__filter select, .enq select, .enq textarea {
+  padding: 12px 14px; border: 1.5px solid var(--paper-2); border-radius: 12px; background: var(--white); font: 15px var(--body); color: var(--ink);
+}
+.admin__filter input { flex: 1; min-width: 220px; }
+.admin__list { display: grid; gap: 12px; }
+.enq { padding: 22px; border-radius: 20px; background: var(--white); display: grid; gap: 12px; border-left: 5px solid var(--line); }
+.enq[data-status="new"] { border-left-color: var(--blue); }
+.enq[data-status="contacted"] { border-left-color: #E0A43B; }
+.enq[data-status="demo"] { border-left-color: #9B6EEA; }
+.enq[data-status="won"] { border-left-color: var(--leaf); }
+.enq__head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; }
+.enq__head h3 { margin: 0; font: 600 22px/1.2 var(--display); }
+.enq__head time { font-size: 13px; color: var(--muted); }
+.enq__meta { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 14px; }
+.enq__meta a { color: var(--blue-d); font-weight: 600; }
+.enq__meta span { color: var(--muted); }
+.enq__meta b { color: var(--ink); font-weight: 600; }
+.enq__msg { margin: 0; padding: 12px 14px; border-radius: 12px; background: var(--paper); white-space: pre-wrap; font-size: 15px; }
+.enq__row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-start; }
+.enq textarea { flex: 1; min-width: 200px; min-height: 44px; resize: vertical; font-size: 14px; }
+.enq__del { background: none; border: 0; color: #C2410C; font-size: 13px; padding: 12px 6px; }
+.admin__empty[hidden] { display: none; }
+@media (max-width: 600px) { .admin__stats { grid-template-columns: 1fr; } }

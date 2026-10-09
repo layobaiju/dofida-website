@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Enquiries · Dofida admin</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <script src="/js/admin.js" defer></script>
+</head>
+<body class="admin">
+  <header class="admin__top">
+    <a class="nav__brand" href="/"><img src="/img/logo-mark.svg" alt="" width="28" height="28"><span>Dofida <small>ADMIN</small></span></a>
+    <div class="admin__actions" id="actions" hidden>
+      <button class="btn btn--ghost btn--sm" id="refresh" type="button">Refresh</button>
+      <button class="btn btn--ink btn--sm" id="csv" type="button">Export CSV</button>
+      <button class="btn btn--ghost btn--sm" id="logout" type="button">Sign out</button>
+    </div>
+  </header>
+
+  <main class="admin__main">
+    <form class="form admin__login" id="login">
+      <h1 class="h2">Sign in</h1>
+      <p class="muted">Enter the admin token configured on the server (<code>ADMIN_TOKEN</code>).</p>
+      <label class="field"><span>Admin token</span><input type="password" name="token" autocomplete="current-password" required></label>
+      <button class="btn btn--ink" type="submit">Open dashboard</button>
+      <p class="form__status" id="loginStatus" role="status"></p>
+    </form>
+
+    <section id="dash" hidden>
+      <div class="admin__stats">
+        <div class="fact"><b id="sTotal">0</b><span>Total enquiries</span></div>
+        <div class="fact"><b id="sNew">0</b><span>New, not yet contacted</span></div>
+        <div class="fact"><b id="sDl">0</b><span>Brochure downloads</span></div>
+      </div>
+      <div class="admin__filter">
+        <input id="search" type="search" placeholder="Search name, phone, nursery, town…">
+        <select id="statusFilter">
+          <option value="">All statuses</option>
+          <option value="new">New</option>
+          <option value="contacted">Contacted</option>
+          <option value="demo">Demo booked</option>
+          <option value="won">Won</option>
+          <option value="closed">Closed</option>
+        </select>
+      </div>
+      <div class="admin__list" id="list"></div>
+      <p class="muted admin__empty" id="empty" hidden>No enquiries yet.</p>
+    </section>
+  </main>
+</body>
+</html>
