@@ -75,6 +75,7 @@ Settings go in a `.env` file in the project folder (copy `.env.example` to start
 | Variable | Purpose |
 | --- | --- |
 | `PORT` | Port to listen on (default `3000`) |
+| `HOST` | Address to listen on; use `127.0.0.1` on a shared server behind nginx |
 | `ADMIN_TOKEN` | Password for `/admin`. If it's not set, the admin dashboard is turned off. |
 | `DATA_FILE` | Where enquiries are stored (default `data/db.json`) |
 | `CONTACT_PHONE`, `CONTACT_WHATSAPP`, `CONTACT_EMAIL` | Shown on the site and in the brochure when set |

@@ -10,6 +10,8 @@ const { createApp } = require('./src/app');
 const { createStore } = require('./src/store');
 
 const PORT = Number(process.env.PORT) || 3000;
+// On a shared server set HOST=127.0.0.1 so only the web server (nginx) can reach the app.
+const HOST = process.env.HOST || undefined;
 const DATA_FILE = process.env.DATA_FILE || path.join(__dirname, 'data', 'db.json');
 
 // Optional: POST every new enquiry to a webhook (Slack, Zapier, Make, n8n, etc.).
@@ -29,7 +31,7 @@ const notify = webhook
 const store = createStore(DATA_FILE);
 const app = createApp({ store, notify });
 
-app.listen(PORT, () => {
-  console.log(`Dofida website running at http://localhost:${PORT}`);
+app.listen(PORT, HOST, () => {
+  console.log(`Dofida website running at http://${HOST || 'localhost'}:${PORT}`);
   if (!process.env.ADMIN_TOKEN) console.log('Admin dashboard disabled: set ADMIN_TOKEN to enable /admin');
 });
