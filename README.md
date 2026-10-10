@@ -3,7 +3,7 @@
 The website for **Dofida Group**. We build and maintain websites, mobile apps, e-commerce stores and custom software for every kind of business, and make **Plant Bill**: billing software for plant nurseries that runs on Android and iOS and comes with a billing printer. Serving all of Kerala and Karnataka from offices in Calicut and Hunsur.
 
 - Animated landing page with a dark split-down intro, services, Plant Bill product, features, compare slider, pricing, brochure, locations, FAQ and enquiry form
-- Plant Bill pricing: ₹20,400 for the first nursery, 50% off (₹10,200) for each extra nursery under the same owner, printer included, plus ₹199/month for all nurseries
+- Plant Bill pricing: ₹20,000 for the first nursery, 50% off (₹10,000) for each extra nursery under the same owner, printer included, plus ₹199/month for all nurseries
 - **Animated brochure** at `/brochure` (also embedded on the home page): swipeable, keyboard and touch friendly, works on phones, fold phones, tablets and computers
 - **Downloadable PDF brochure** generated from the same data
 - **Enquiry form** backed by an API, with validation, spam protection and rate limiting

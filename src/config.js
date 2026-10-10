@@ -21,7 +21,7 @@ const company = {
 
 const pricing = {
   currency: 'INR',
-  firstNursery: 20400,
+  firstNursery: 20000,
   // Every additional nursery under the same owner gets 50% off the first-nursery price.
   additionalDiscountPercent: 50,
   get additionalNursery() {

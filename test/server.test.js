@@ -31,8 +31,8 @@ const post = (body) => fetch(`${base}/api/enquiries`, { method: 'POST', headers:
 const admin = (p, opts = {}) => fetch(`${base}/api/admin${p}`, { ...opts, headers: { Authorization: `Bearer ${TOKEN}`, 'Content-Type': 'application/json' } });
 
 test('additional nursery is 50% of the first nursery price', () => {
-  assert.equal(pricing.firstNursery, 20400);
-  assert.equal(pricing.additionalNursery, 10200);
+  assert.equal(pricing.firstNursery, 20000);
+  assert.equal(pricing.additionalNursery, 10000);
   assert.equal(pricing.monthly, 199);
 });
 
@@ -51,8 +51,8 @@ test('home page renders with prices filled in and security headers', async () =>
   const res = await fetch(base);
   assert.equal(res.status, 200);
   const html = await res.text();
-  assert.match(html, /₹20,400/);
-  assert.match(html, /₹10,200/);
+  assert.match(html, /₹20,000/);
+  assert.match(html, /₹10,000/);
   assert.match(html, /₹199/);
   assert.match(html, /id="services"/);
   assert.match(html, /src="\/brochure\?embed=1&amp;lang=en"/);
@@ -80,7 +80,7 @@ test('every page renders fully in English, Malayalam and Kannada', async () => {
       const html = await res.text();
       assert.doesNotMatch(html, /\{\{[\w.]+\}\}/, `${lang} ${path} has unfilled tokens`);
       assert.match(html, new RegExp(`<html lang="${lang}">`));
-      assert.match(html, /₹20,400/, 'numbers stay the same in every language');
+      assert.match(html, /₹20,000/, 'numbers stay the same in every language');
       assert.match(res.headers.get('set-cookie') || '', new RegExp(`lang=${lang}`));
     }
     const home = await (await fetch(`${base}/?lang=${lang}`)).text();
@@ -129,10 +129,10 @@ test('unknown pages return 404', async () => {
 
 test('quote endpoint applies the multi-nursery discount', async () => {
   const one = await (await fetch(`${base}/api/quote?nurseries=1`)).json();
-  assert.equal(one.total, 20400);
+  assert.equal(one.total, 20000);
   const three = await (await fetch(`${base}/api/quote?nurseries=3`)).json();
-  assert.equal(three.total, 20400 + 2 * 10200);
-  assert.equal(three.savings, 2 * 10200);
+  assert.equal(three.total, 20000 + 2 * 10000);
+  assert.equal(three.savings, 2 * 10000);
   assert.equal(three.monthly, 199);
   assert.equal((await fetch(`${base}/api/quote?nurseries=0`)).status, 400);
 });
@@ -171,7 +171,7 @@ test('valid enquiry is saved, persisted, estimated and notified', async () => {
   assert.equal(res.status, 201);
   const { id } = await res.json();
   const saved = store.listEnquiries().find((e) => e.id === id);
-  assert.equal(saved.estimate, 30600);
+  assert.equal(saved.estimate, 30000);
   assert.equal(saved.status, 'new');
   assert.equal(notified.at(-1).id, id);
   await store.flush();
